@@ -1,0 +1,73 @@
+name: Build, Push to Docker Hub, and Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
+          context: .
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "Pulling latest Docker image..."
+            docker pull ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
+
+            echo "Stopping existing container (if any)..."
+            docker stop vpn-web-container || true
+            docker rm vpn-web-container || true
+
+            echo "Starting vpn-web..."
+            docker run -d \
+              --name vpn-web-container \
+              --network remnawave-network \
+              --restart unless-stopped \
+              ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
+
+            echo "Connecting to vpn-net..."
+            docker network connect vpn-net vpn-web-container
+
+            echo "Reloading remnawave-nginx..."
+            docker exec remnawave-nginx nginx -s reload || true
+
+            echo "Verifying container started..."
+            sleep 3
+            if docker ps | grep -q vpn-web-container; then
+              echo "vpn-web is running!"
+            else
+              echo "ERROR: vpn-web failed to start!"
+              docker logs vpn-web-container
+              exit 1
+            fi
+
+            echo "Deployment complete!"

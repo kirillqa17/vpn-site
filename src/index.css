@@ -1,0 +1,79 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overscroll-behavior: none;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-900/80 backdrop-blur-xl border border-surface-800 rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply glass-card transition-all duration-200 hover:border-surface-600 hover:bg-surface-800/80;
+  }
+
+  .btn-primary {
+    @apply bg-white text-black font-semibold rounded-xl px-6 py-3
+           transition-all duration-200 hover:bg-surface-200 active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply bg-surface-800 text-surface-200 font-medium rounded-xl px-6 py-3
+           border border-surface-700 transition-all duration-200
+           hover:bg-surface-700 hover:border-surface-600 active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply text-surface-400 font-medium rounded-xl px-4 py-2
+           transition-all duration-200 hover:text-surface-200 hover:bg-surface-800;
+  }
+
+  .input-field {
+    @apply w-full bg-surface-900 border border-surface-700 rounded-xl px-4 py-3
+           text-surface-100 placeholder:text-surface-500
+           focus:outline-none focus:border-surface-500 focus:ring-1 focus:ring-surface-500
+           transition-all duration-200;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-active {
+    @apply badge bg-emerald-500/15 text-emerald-400 border border-emerald-500/20;
+  }
+
+  .badge-inactive {
+    @apply badge bg-red-500/15 text-red-400 border border-red-500/20;
+  }
+
+  .badge-expiring {
+    @apply badge bg-amber-500/15 text-amber-400 border border-amber-500/20;
+  }
+}

@@ -15,11 +15,12 @@ export const MOCK_USER: User = {
   sub_link: 'https://sub.svoivpn.online/api/sub/example-uuid/happ',
   payed_refs: 2,
   device_limit: 2,
-  auto_renew: false,
-  payment_method_id: '',
-  auto_renew_plan: '',
-  auto_renew_duration: '',
+  auto_renew: true,
+  payment_method_id: 'pm_test123',
+  auto_renew_plan: 'base',
+  auto_renew_duration: '1m',
   is_pro: false,
+  card_last4: '4276',
 }
 
 export const MOCK_DEVICES: Device[] = [

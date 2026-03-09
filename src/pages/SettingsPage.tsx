@@ -1,8 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreditCard, Zap, RefreshCw, Trash2, Info } from 'lucide-react'
+import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar } from 'lucide-react'
 import { getMe } from '../api/user'
 import { toggleAutoRenew, togglePro, unbindCard } from '../api/subscription'
-import { TARIFF_NAMES } from '../utils/constants'
+import { TARIFF_NAMES, DURATION_LABELS } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
 import Toggle from '../components/ui/Toggle'
 import Spinner from '../components/ui/Spinner'
@@ -64,7 +64,11 @@ export default function SettingsPage() {
             <div>
               <p className="text-sm font-medium">Карта</p>
               <p className="text-xs text-surface-500">
-                {hasCard ? 'Привязана' : 'Не привязана'}
+                {hasCard
+                  ? user.card_last4
+                    ? `•••• ${user.card_last4}`
+                    : 'Привязана'
+                  : 'Не привязана'}
               </p>
             </div>
           </div>
@@ -89,6 +93,7 @@ export default function SettingsPage() {
               {user.auto_renew && user.auto_renew_plan && (
                 <p className="text-xs text-surface-500">
                   {TARIFF_NAMES[user.auto_renew_plan] || user.auto_renew_plan}
+                  {user.auto_renew_duration && ` / ${DURATION_LABELS[user.auto_renew_duration] || user.auto_renew_duration}`}
                 </p>
               )}
             </div>
@@ -99,6 +104,12 @@ export default function SettingsPage() {
             disabled={!hasCard || autoRenewMutation.isPending}
           />
         </div>
+        {user.auto_renew && user.subscription_end && (
+          <div className="flex items-center gap-2 text-xs text-surface-400">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Следующий платёж: {new Date(user.subscription_end).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+          </div>
+        )}
         {!hasCard && (
           <p className="text-xs text-surface-500">
             Для автопродления необходимо привязать карту при оплате

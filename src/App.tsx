@@ -18,6 +18,12 @@ export default function App() {
   const { isMiniApp, initData } = useTelegram()
 
   useEffect(() => {
+    // Dev mode: skip auth on localhost
+    if (import.meta.env.DEV) {
+      setAuth('dev-token', 0)
+      return
+    }
+
     const saved = localStorage.getItem('auth')
     if (saved) {
       try {

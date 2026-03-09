@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { Users, Copy, Check, Gift, Trophy } from 'lucide-react'
+import { Users, Copy, Check, Gift, Trophy, User, CircleDollarSign } from 'lucide-react'
 import { getReferralInfo } from '../api/user'
 import { useTelegram } from '../hooks/useTelegram'
 import Spinner from '../components/ui/Spinner'
 import { useState } from 'react'
-import { BOT_USERNAME } from '../utils/constants'
+import { BOT_USERNAME, TARIFF_NAMES } from '../utils/constants'
 
 const MILESTONES = [
   { count: 5, reward: '365 дней подписки (Семейный)' },
@@ -91,6 +91,40 @@ export default function ReferralPage() {
           </div>
         </div>
       </div>
+
+      {/* Referral list */}
+      {data.referrals && data.referrals.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-sm text-surface-400 font-medium">Ваши рефералы</p>
+          <div className="glass-card divide-y divide-surface-800">
+            {data.referrals.map((ref) => (
+              <div key={ref.telegram_id} className="flex items-center gap-3 p-3">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                  ref.has_paid ? 'bg-emerald-500/15' : 'bg-surface-800'
+                }`}>
+                  <User className={`w-4 h-4 ${ref.has_paid ? 'text-emerald-400' : 'text-surface-500'}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">
+                    {ref.username ? `@${ref.username}` : `ID: ${ref.telegram_id}`}
+                  </p>
+                  {ref.plan && (
+                    <p className="text-xs text-surface-500">{TARIFF_NAMES[ref.plan] || ref.plan}</p>
+                  )}
+                </div>
+                {ref.has_paid ? (
+                  <span className="badge-active flex items-center gap-1 text-xs">
+                    <CircleDollarSign className="w-3 h-3" />
+                    Оплатил
+                  </span>
+                ) : (
+                  <span className="text-xs text-surface-500">Не оплатил</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Milestones */}
       <div className="space-y-2">

@@ -47,8 +47,17 @@ export interface PaymentResult {
   payment_id: string
 }
 
+export interface Referral {
+  telegram_id: number
+  username: string
+  is_active: boolean
+  has_paid: boolean
+  plan: string
+}
+
 export interface ReferralInfo {
   invite_link: string
   referrals_count: number
   payed_refs: number
+  referrals: Referral[]
 }

@@ -1,8 +1,8 @@
 export const TARIFF_NAMES: Record<string, string> = {
   base: 'Базовый',
   family: 'Семейный',
-  bsbase: 'Базовый PRO',
-  bsfamily: 'Семейный PRO',
+  bsbase: 'Обход БС (Базовый)',
+  bsfamily: 'Обход БС (Семейный)',
   trial: 'Пробный',
   free: 'Бесплатный',
 }

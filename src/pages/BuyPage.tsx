@@ -49,7 +49,8 @@ export default function BuyPage() {
         tariff,
         duration,
         promo_code: promoResult?.valid ? promo : undefined,
-        save_payment_method: true,
+        // TODO: включить когда ЮKassa одобрит рекуррентные платежи
+        // save_payment_method: true,
       })
       if (isMiniApp && tg) {
         tg.openLink(payment_url)

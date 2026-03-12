@@ -101,7 +101,7 @@ export default function SettingsPage() {
           <Toggle
             enabled={user.auto_renew}
             onChange={(val) => autoRenewMutation.mutate(val)}
-            disabled={!hasCard || autoRenewMutation.isPending}
+            disabled={(!hasCard && !user.auto_renew) || autoRenewMutation.isPending}
           />
         </div>
         {user.auto_renew && user.subscription_end && (

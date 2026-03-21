@@ -19,6 +19,7 @@ export interface User {
   auto_renew_duration: string
   is_pro: boolean
   card_last4: string
+  email?: string
 }
 
 export interface Device {

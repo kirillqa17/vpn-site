@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar } from 'lucide-react'
+import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar, Mail, Check } from 'lucide-react'
 import { getMe } from '../api/user'
 import { toggleAutoRenew, togglePro, unbindCard } from '../api/subscription'
+import { linkEmail } from '../api/auth'
 import { TARIFF_NAMES, DURATION_LABELS } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
 import Toggle from '../components/ui/Toggle'
@@ -14,6 +15,10 @@ export default function SettingsPage() {
   const queryClient = useQueryClient()
   const [showUnbind, setShowUnbind] = useState(false)
   const [showProInfo, setShowProInfo] = useState(false)
+  const [linkEmailValue, setLinkEmailValue] = useState('')
+  const [linkPasswordValue, setLinkPasswordValue] = useState('')
+  const [linkEmailError, setLinkEmailError] = useState('')
+  const [linkEmailSuccess, setLinkEmailSuccess] = useState(false)
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
 
@@ -39,6 +44,22 @@ export default function SettingsPage() {
       queryClient.invalidateQueries({ queryKey: ['me'] })
       haptic?.notificationOccurred('success')
       setShowUnbind(false)
+    },
+  })
+
+  const linkEmailMutation = useMutation({
+    mutationFn: () => linkEmail(linkEmailValue, linkPasswordValue),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+      haptic?.notificationOccurred('success')
+      setLinkEmailValue('')
+      setLinkPasswordValue('')
+      setLinkEmailError('')
+      setLinkEmailSuccess(true)
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data?.error || err?.response?.data?.message
+      setLinkEmailError(msg || 'Не удалось привязать email')
     },
   })
 
@@ -143,6 +164,68 @@ export default function SettingsPage() {
             />
           </div>
         </div>
+      </div>
+
+      {/* Link Email */}
+      <div className="glass-card p-4 space-y-3">
+        <div className="flex items-center gap-3">
+          <Mail className="w-5 h-5 text-surface-400" />
+          <div>
+            <p className="text-sm font-medium">Email для входа</p>
+            <p className="text-xs text-surface-500">
+              {user.email ? user.email : 'Не привязан'}
+            </p>
+          </div>
+        </div>
+        {user.email ? (
+          <div className="flex items-center gap-2 text-xs text-green-400">
+            <Check className="w-3.5 h-3.5" />
+            <span>Email привязан</span>
+          </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <input
+                type="email"
+                placeholder="Email"
+                value={linkEmailValue}
+                onChange={(e) => { setLinkEmailValue(e.target.value); setLinkEmailError(''); setLinkEmailSuccess(false) }}
+                className="input-field text-sm"
+              />
+              <input
+                type="password"
+                placeholder="Пароль"
+                value={linkPasswordValue}
+                onChange={(e) => { setLinkPasswordValue(e.target.value); setLinkEmailError(''); setLinkEmailSuccess(false) }}
+                className="input-field text-sm"
+              />
+            </div>
+            {linkEmailError && (
+              <p className="text-red-400 text-xs">{linkEmailError}</p>
+            )}
+            {linkEmailSuccess && (
+              <p className="text-green-400 text-xs">Email успешно привязан</p>
+            )}
+            <button
+              onClick={() => {
+                setLinkEmailError('')
+                if (!linkEmailValue.trim() || !linkPasswordValue.trim()) {
+                  setLinkEmailError('Заполните все поля')
+                  return
+                }
+                if (linkPasswordValue.length < 6) {
+                  setLinkEmailError('Пароль должен содержать минимум 6 символов')
+                  return
+                }
+                linkEmailMutation.mutate()
+              }}
+              disabled={linkEmailMutation.isPending}
+              className="btn-primary w-full text-sm"
+            >
+              {linkEmailMutation.isPending ? 'Привязка...' : 'Привязать email'}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Unbind confirmation */}

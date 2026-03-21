@@ -180,27 +180,37 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
-        {user.email ? (
-          <div className="flex items-center gap-2 text-xs text-green-400">
-            <Check className="w-3.5 h-3.5" />
-            <span>Email привязан</span>
+        {user.email && emailMode !== 'merge' ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-green-400">
+              <Check className="w-3.5 h-3.5" />
+              <span>Email привязан</span>
+            </div>
+            <button
+              onClick={() => { setEmailMode('merge'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
+              className="text-xs text-surface-500 hover:text-white transition-colors"
+            >
+              Объединить с другим аккаунтом
+            </button>
           </div>
         ) : (
           <>
-            <div className="flex gap-1 mb-2">
-              <button
-                onClick={() => { setEmailMode('link'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
-                className={`flex-1 text-xs py-1.5 rounded-lg transition-colors ${emailMode === 'link' ? 'bg-surface-700 text-white' : 'text-surface-500'}`}
-              >
-                Новый email
-              </button>
-              <button
-                onClick={() => { setEmailMode('merge'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
-                className={`flex-1 text-xs py-1.5 rounded-lg transition-colors ${emailMode === 'merge' ? 'bg-surface-700 text-white' : 'text-surface-500'}`}
-              >
-                У меня есть аккаунт
-              </button>
-            </div>
+            {!user.email && (
+              <div className="flex gap-1 mb-2">
+                <button
+                  onClick={() => { setEmailMode('link'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
+                  className={`flex-1 text-xs py-1.5 rounded-lg transition-colors ${emailMode === 'link' ? 'bg-surface-700 text-white' : 'text-surface-500'}`}
+                >
+                  Новый email
+                </button>
+                <button
+                  onClick={() => { setEmailMode('merge'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
+                  className={`flex-1 text-xs py-1.5 rounded-lg transition-colors ${emailMode === 'merge' ? 'bg-surface-700 text-white' : 'text-surface-500'}`}
+                >
+                  У меня есть аккаунт
+                </button>
+              </div>
+            )}
             {emailMode === 'merge' && (
               <p className="text-xs text-surface-500 mb-2">
                 Введите email и пароль от аккаунта на сайте — подписка и данные будут перенесены сюда
@@ -229,6 +239,14 @@ export default function SettingsPage() {
               <p className="text-green-400 text-xs">
                 {emailMode === 'merge' ? 'Аккаунты успешно объединены' : 'Email успешно привязан'}
               </p>
+            )}
+            {emailMode === 'merge' && user.email && (
+              <button
+                onClick={() => { setEmailMode('link'); setLinkEmailValue(''); setLinkPasswordValue(''); setLinkEmailError(''); setLinkEmailSuccess(false) }}
+                className="text-xs text-surface-500 hover:text-white transition-colors w-full text-center"
+              >
+                Отмена
+              </button>
             )}
             <button
               onClick={() => {

@@ -31,7 +31,7 @@ export default function ReferralPage() {
   if (!data) return null
 
   const botLink = data.invite_link || `https://t.me/${BOT_USERNAME}?start=${data.telegram_id}`
-  const webLink = data.web_invite_link || `https://site.svoivpn.online/?ref=${data.telegram_id}`
+  const webLink = data.web_invite_link || `https://svoiweb.ru/?ref=${data.telegram_id}`
 
   async function copyLink(link: string, label: string) {
     try {

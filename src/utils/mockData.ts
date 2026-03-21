@@ -36,7 +36,9 @@ export const MOCK_PRICES: TariffPrices = {
 }
 
 export const MOCK_REFERRAL: ReferralInfo = {
+  telegram_id: 123456789,
   invite_link: 'https://t.me/svoivless_bot?start=123456789',
+  web_invite_link: 'https://site.svoivpn.online/?ref=123456789',
   referrals_count: 3,
   payed_refs: 2,
   referrals: [

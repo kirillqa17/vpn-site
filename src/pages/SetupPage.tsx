@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
-import { Apple, Smartphone, Monitor, ExternalLink, Copy, Check, HelpCircle, Clock, MessageCircle } from 'lucide-react'
+import { Apple, Smartphone, Monitor, ExternalLink, Copy, Check, HelpCircle, Clock, Send } from 'lucide-react'
 import { getMe } from '../api/user'
+import { generateLinkCode } from '../api/auth'
 import { useTelegram } from '../hooks/useTelegram'
-import { BOT_USERNAME } from '../utils/constants'
 import Spinner from '../components/ui/Spinner'
 
 type Platform = 'ios' | 'android' | 'pc' | null
@@ -28,6 +28,14 @@ export default function SetupPage() {
   const isTrialRedirect = searchParams.get('trial') === '1'
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
+  const isEmailUser = user && user.telegram_id < 0
+
+  const linkMutation = useMutation({
+    mutationFn: generateLinkCode,
+    onSuccess: (data) => {
+      window.open(data.deeplink, '_blank')
+    },
+  })
 
   if (isLoading) {
     return (
@@ -73,14 +81,27 @@ export default function SetupPage() {
             <Clock className="w-4 h-4" />
             <p className="text-sm font-medium">У вас 1 час VPN-доступа</p>
           </div>
-          <div className="text-xs text-surface-400 space-y-2">
-            <p>1. Установите приложение и подключите VPN (ниже)</p>
-            <p>2. Откройте Telegram</p>
-            <p>3. Зайдите в <a href={`https://t.me/${BOT_USERNAME}`} target="_blank" className="text-white underline">@{BOT_USERNAME}</a> → мини-приложение</p>
-            <p>4. Настройки → <span className="text-white">«У меня есть аккаунт»</span> → введите email и пароль</p>
-            <p>5. Аккаунты объединятся и пробный продлится до <span className="text-white">7 дней</span></p>
-          </div>
+          <p className="text-xs text-surface-400">
+            Установите VPN по инструкции ниже, затем привяжите Telegram для полного пробного периода на 7 дней
+          </p>
         </div>
+      )}
+
+      {/* Link Telegram button */}
+      {isEmailUser && (
+        <button
+          onClick={() => linkMutation.mutate()}
+          disabled={linkMutation.isPending}
+          className="glass-card p-4 w-full flex items-center gap-3 border border-blue-500/20 hover:border-blue-500/40 transition-colors"
+        >
+          <Send className="w-5 h-5 text-blue-400" />
+          <div className="text-left flex-1">
+            <p className="text-sm font-medium">Привязать Telegram</p>
+            <p className="text-xs text-surface-500">
+              {isTrialRedirect ? 'Получите полный пробный период на 7 дней' : 'Объединить аккаунт сайта с Telegram'}
+            </p>
+          </div>
+        </button>
       )}
 
       {/* Platform selector */}

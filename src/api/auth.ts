@@ -40,3 +40,8 @@ export async function mergeEmailAccount(email: string, password: string) {
   const { data } = await api.post('/web/auth/merge-email', { email, password })
   return data
 }
+
+export async function generateLinkCode() {
+  const { data } = await api.post<{ code: string; deeplink: string }>('/web/auth/link-code')
+  return data
+}

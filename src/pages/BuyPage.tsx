@@ -49,7 +49,7 @@ export default function BuyPage() {
         tariff,
         duration,
         promo_code: promoResult?.valid ? promo : undefined,
-        save_payment_method: true,
+        save_payment_method: user?.auto_renew ?? false,
       })
       if (isMiniApp && tg) {
         tg.openLink(payment_url)

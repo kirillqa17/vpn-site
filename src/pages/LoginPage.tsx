@@ -16,6 +16,13 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
 
+  // Read referral ID from URL (?ref=123)
+  const referralId = (() => {
+    const params = new URLSearchParams(window.location.search)
+    const ref = params.get('ref')
+    return ref ? parseInt(ref, 10) : undefined
+  })()
+
   useEffect(() => {
     ;(window as any).onTelegramAuth = async (authData: Record<string, string>) => {
       try {
@@ -61,8 +68,9 @@ export default function LoginPage() {
 
     setIsSubmitting(true)
     try {
-      const fn = isRegister ? registerWithEmail : loginWithEmail
-      const { token, telegram_id } = await fn(email, password)
+      const { token, telegram_id } = isRegister
+        ? await registerWithEmail(email, password, referralId)
+        : await loginWithEmail(email, password)
       localStorage.setItem('auth', JSON.stringify({ token, telegramId: telegram_id }))
       setAuth(token, telegram_id)
     } catch (err: any) {

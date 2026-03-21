@@ -16,10 +16,10 @@ export async function loginWithTelegramWidget(authData: Record<string, string>) 
   return data
 }
 
-export async function registerWithEmail(email: string, password: string) {
+export async function registerWithEmail(email: string, password: string, referralId?: number) {
   const { data } = await api.post<{ token: string; telegram_id: number }>(
     '/web/auth/register',
-    { email, password },
+    { email, password, referral_id: referralId || undefined },
   )
   return data
 }

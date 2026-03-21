@@ -13,7 +13,7 @@ const MILESTONES = [
 
 export default function ReferralPage() {
   const { haptic } = useTelegram()
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied] = useState<string | false>(false)
 
   const { data, isLoading } = useQuery({
     queryKey: ['referral'],
@@ -30,12 +30,13 @@ export default function ReferralPage() {
 
   if (!data) return null
 
-  const inviteLink = data.invite_link || `https://t.me/${BOT_USERNAME}?start=${data.payed_refs}`
+  const botLink = data.invite_link || `https://t.me/${BOT_USERNAME}?start=${data.telegram_id}`
+  const webLink = data.web_invite_link || `https://site.svoivpn.online/?ref=${data.telegram_id}`
 
-  async function copyLink() {
+  async function copyLink(link: string, label: string) {
     try {
-      await navigator.clipboard.writeText(inviteLink)
-      setCopied(true)
+      await navigator.clipboard.writeText(link)
+      setCopied(label)
       haptic?.notificationOccurred('success')
       setTimeout(() => setCopied(false), 2000)
     } catch {
@@ -61,18 +62,33 @@ export default function ReferralPage() {
         </div>
       </div>
 
-      {/* Invite link */}
+      {/* Invite links */}
       <div className="glass-card p-4 space-y-3">
-        <p className="text-sm font-medium">Ваша реферальная ссылка</p>
+        <p className="text-sm font-medium">Реферальная ссылка (Telegram)</p>
         <div className="flex gap-2">
           <code className="flex-1 bg-surface-800 rounded-lg px-3 py-2.5 text-xs text-surface-300 overflow-hidden text-ellipsis whitespace-nowrap">
-            {inviteLink}
+            {botLink}
           </code>
           <button
-            onClick={copyLink}
+            onClick={() => copyLink(botLink, 'bot')}
             className="btn-secondary px-3 py-2"
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            {copied === 'bot' ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+          </button>
+        </div>
+      </div>
+
+      <div className="glass-card p-4 space-y-3">
+        <p className="text-sm font-medium">Реферальная ссылка (Сайт)</p>
+        <div className="flex gap-2">
+          <code className="flex-1 bg-surface-800 rounded-lg px-3 py-2.5 text-xs text-surface-300 overflow-hidden text-ellipsis whitespace-nowrap">
+            {webLink}
+          </code>
+          <button
+            onClick={() => copyLink(webLink, 'web')}
+            className="btn-secondary px-3 py-2"
+          >
+            {copied === 'web' ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
           </button>
         </div>
       </div>

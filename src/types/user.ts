@@ -58,7 +58,9 @@ export interface Referral {
 }
 
 export interface ReferralInfo {
+  telegram_id: number
   invite_link: string
+  web_invite_link: string
   referrals_count: number
   payed_refs: number
   referrals: Referral[]

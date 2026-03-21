@@ -1,7 +1,6 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTelegram } from '../../hooks/useTelegram'
 import BottomNav from './BottomNav'
-import { Shield } from 'lucide-react'
 import { useEffect } from 'react'
 
 export default function AppShell() {
@@ -34,8 +33,8 @@ export default function AppShell() {
         <header className="sticky top-0 z-50 bg-surface-950/80 backdrop-blur-xl border-b border-surface-800">
           <div className="max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
             <button onClick={() => navigate('/')} className="flex items-center gap-2">
-              <Shield className="w-6 h-6 text-white" />
-              <span className="font-bold text-lg">SvoiVPN</span>
+              <img src="/logo.jpg" alt="SvoiVPN" className="w-7 h-7 rounded-lg" />
+              <span className="font-bold text-lg tracking-tight">SvoiVPN</span>
             </button>
           </div>
         </header>

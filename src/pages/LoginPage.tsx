@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Shield, Mail, Eye, EyeOff } from 'lucide-react'
+import { Mail, Eye, EyeOff } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { loginWithTelegramWidget, loginWithEmail, registerWithEmail } from '../api/auth'
 import { BOT_USERNAME } from '../utils/constants'
@@ -91,8 +91,8 @@ export default function LoginPage() {
     <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center px-4">
       <div className="max-w-sm w-full text-center space-y-8">
         <div className="space-y-3">
-          <Shield className="w-14 h-14 text-white mx-auto" />
-          <h1 className="text-3xl font-bold">SvoiVPN</h1>
+          <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />
+          <h1 className="text-3xl font-bold tracking-tight">SvoiVPN</h1>
           <p className="text-surface-400 text-sm">
             Безопасный VPN для всех ваших устройств
           </p>
@@ -184,17 +184,25 @@ export default function LoginPage() {
           <div ref={containerRef} className="flex justify-center" />
         </div>
 
-        <p className="text-xs text-surface-600">
-          Нет аккаунта? Напишите{' '}
+        <div className="flex items-center justify-center gap-4 text-xs text-surface-600">
           <a
             href={`https://t.me/${BOT_USERNAME}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-surface-400 hover:text-white transition-colors"
+            className="hover:text-white transition-colors"
           >
-            @{BOT_USERNAME}
+            Telegram-бот
           </a>
-        </p>
+          <span>·</span>
+          <a
+            href="https://t.me/svoivpnnews"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-white transition-colors"
+          >
+            Новости
+          </a>
+        </div>
       </div>
     </div>
   )

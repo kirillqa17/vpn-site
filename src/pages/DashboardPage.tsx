@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-import { Shield, Clock, Smartphone, ChevronRight, Zap, AlertTriangle } from 'lucide-react'
+import { Clock, Smartphone, ChevronRight, Zap, AlertTriangle } from 'lucide-react'
 import { getMe } from '../api/user'
 import { formatDate, daysUntil, isExpired, isExpiringSoon } from '../utils/formatDate'
 import { TARIFF_NAMES } from '../utils/constants'
@@ -45,11 +45,7 @@ export default function DashboardPage() {
       <div className="glass-card p-5">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
-            <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-              expired ? 'bg-red-500/15' : 'bg-emerald-500/15'
-            }`}>
-              <Shield className={`w-5 h-5 ${expired ? 'text-red-400' : 'text-emerald-400'}`} />
-            </div>
+            <img src="/logo.jpg" alt="SvoiVPN" className={`w-10 h-10 rounded-xl ${expired ? 'opacity-50 grayscale' : ''}`} />
             <div>
               <h2 className="font-semibold text-lg">SvoiVPN</h2>
               <p className="text-sm text-surface-400">{planName}</p>
@@ -159,6 +155,15 @@ export default function DashboardPage() {
           </p>
         </div>
       )}
+
+      {/* Links */}
+      <div className="flex items-center justify-center gap-4 text-xs text-surface-600 pt-2">
+        <a href="https://t.me/svoivless_bot" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Telegram-бот</a>
+        <span>·</span>
+        <a href="https://t.me/svoivpnnews" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Новости</a>
+        <span>·</span>
+        <a href="https://t.me/svoivpn_help_bot" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Поддержка</a>
+      </div>
     </div>
   )
 }

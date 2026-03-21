@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { Check, Tag, CreditCard, Bitcoin, Loader2 } from 'lucide-react'
 import { getPrices, createPayment, createCryptoPayment, validatePromo, activateTrial } from '../api/subscription'
 import { getMe } from '../api/user'
@@ -14,6 +15,7 @@ const CRYPTO_CURRENCIES = ['TON', 'USDT', 'TRON', 'SOL', 'ETH', 'BNB'] as const
 export default function BuyPage() {
   const { haptic, tg, isMiniApp } = useTelegram()
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
 
   const [tariff, setTariff] = useState<string>('base')
   const [duration, setDuration] = useState<string>('1m')
@@ -30,11 +32,16 @@ export default function BuyPage() {
     onSuccess: (data) => setPromoResult(data),
   })
 
+  const isEmailUser = user && user.telegram_id < 0
+
   const trialMutation = useMutation({
     mutationFn: activateTrial,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
       haptic?.notificationOccurred('success')
+      if (isEmailUser) {
+        navigate('/setup?trial=1')
+      }
     },
   })
 
@@ -91,11 +98,13 @@ export default function BuyPage() {
 
       {/* Trial */}
       {user && !user.is_used_trial && (
-        <div className="glass-card p-4 border-surface-600">
+        <div className="glass-card p-4 border-surface-600 space-y-2">
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Пробный период</p>
-              <p className="text-sm text-surface-400">7 дней бесплатно</p>
+              <p className="text-sm text-surface-400">
+                {isEmailUser ? '1 час доступа + 7 дней после привязки Telegram' : '7 дней бесплатно'}
+              </p>
             </div>
             <button
               onClick={() => { haptic?.selectionChanged(); trialMutation.mutate() }}
@@ -105,8 +114,10 @@ export default function BuyPage() {
               {trialMutation.isPending ? 'Активация...' : 'Активировать'}
             </button>
           </div>
-          {trialMutation.isSuccess && (
-            <p className="text-sm text-emerald-400 mt-2">Пробный период активирован!</p>
+          {isEmailUser && !trialMutation.isSuccess && (
+            <p className="text-xs text-surface-500">
+              Установите VPN, зайдите в Telegram и привяжите аккаунт для полного пробного периода
+            </p>
           )}
         </div>
       )}

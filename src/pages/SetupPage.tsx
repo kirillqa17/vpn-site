@@ -1,8 +1,10 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { Apple, Smartphone, Monitor, ExternalLink, Copy, Check, HelpCircle } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
+import { Apple, Smartphone, Monitor, ExternalLink, Copy, Check, HelpCircle, Clock, MessageCircle } from 'lucide-react'
 import { getMe } from '../api/user'
 import { useTelegram } from '../hooks/useTelegram'
+import { BOT_USERNAME } from '../utils/constants'
 import Spinner from '../components/ui/Spinner'
 
 type Platform = 'ios' | 'android' | 'pc' | null
@@ -22,6 +24,8 @@ export default function SetupPage() {
   const [platform, setPlatform] = useState<Platform>(null)
   const [copied, setCopied] = useState(false)
   const { haptic, tg, isMiniApp } = useTelegram()
+  const [searchParams] = useSearchParams()
+  const isTrialRedirect = searchParams.get('trial') === '1'
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
 
@@ -61,6 +65,23 @@ export default function SetupPage() {
   return (
     <div className="space-y-4 animate-fade-in">
       <h1 className="text-xl font-bold">Установка</h1>
+
+      {/* Trial instructions banner */}
+      {isTrialRedirect && (
+        <div className="glass-card p-4 space-y-3 border border-amber-500/20">
+          <div className="flex items-center gap-2 text-amber-400">
+            <Clock className="w-4 h-4" />
+            <p className="text-sm font-medium">У вас 1 час VPN-доступа</p>
+          </div>
+          <div className="text-xs text-surface-400 space-y-2">
+            <p>1. Установите приложение и подключите VPN (ниже)</p>
+            <p>2. Откройте Telegram</p>
+            <p>3. Зайдите в <a href={`https://t.me/${BOT_USERNAME}`} target="_blank" className="text-white underline">@{BOT_USERNAME}</a> → мини-приложение</p>
+            <p>4. Настройки → <span className="text-white">«У меня есть аккаунт»</span> → введите email и пароль</p>
+            <p>5. Аккаунты объединятся и пробный продлится до <span className="text-white">7 дней</span></p>
+          </div>
+        </div>
+      )}
 
       {/* Platform selector */}
       <div className="grid grid-cols-3 gap-2">

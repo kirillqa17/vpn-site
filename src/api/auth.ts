@@ -35,3 +35,8 @@ export async function loginWithEmail(email: string, password: string) {
 export async function linkEmail(email: string, password: string) {
   await api.post('/web/auth/link-email', { email, password })
 }
+
+export async function mergeEmailAccount(email: string, password: string) {
+  const { data } = await api.post('/web/auth/merge-email', { email, password })
+  return data
+}

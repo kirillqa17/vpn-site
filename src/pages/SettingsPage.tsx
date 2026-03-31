@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar, Mail, Check } from 'lucide-react'
+import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar, Mail, Check, LogOut } from 'lucide-react'
 import { getMe } from '../api/user'
 import { toggleAutoRenew, togglePro, unbindCard } from '../api/subscription'
-import { linkEmail, mergeEmailAccount } from '../api/auth'
+import { linkEmail } from '../api/auth'
 import { TARIFF_NAMES, DURATION_LABELS } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
+import { useAuthStore } from '../stores/authStore'
 import Toggle from '../components/ui/Toggle'
 import Spinner from '../components/ui/Spinner'
 import Modal from '../components/ui/Modal'
@@ -13,13 +14,14 @@ import { useState } from 'react'
 export default function SettingsPage() {
   const { haptic } = useTelegram()
   const queryClient = useQueryClient()
+  const clearAuth = useAuthStore((s) => s.clearAuth)
   const [showUnbind, setShowUnbind] = useState(false)
   const [showProInfo, setShowProInfo] = useState(false)
+  const [showLogout, setShowLogout] = useState(false)
   const [linkEmailValue, setLinkEmailValue] = useState('')
   const [linkPasswordValue, setLinkPasswordValue] = useState('')
   const [linkEmailError, setLinkEmailError] = useState('')
   const [linkEmailSuccess, setLinkEmailSuccess] = useState(false)
-  const [emailMode, setEmailMode] = useState<'link' | 'merge'>('link')
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
 
@@ -49,9 +51,7 @@ export default function SettingsPage() {
   })
 
   const linkEmailMutation = useMutation({
-    mutationFn: () => emailMode === 'merge'
-      ? mergeEmailAccount(linkEmailValue, linkPasswordValue)
-      : linkEmail(linkEmailValue, linkPasswordValue),
+    mutationFn: () => linkEmail(linkEmailValue, linkPasswordValue),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['me'] })
       haptic?.notificationOccurred('success')
@@ -180,42 +180,13 @@ export default function SettingsPage() {
             </p>
           </div>
         </div>
-        {user.email && emailMode !== 'merge' ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs text-green-400">
-              <Check className="w-3.5 h-3.5" />
-              <span>Email привязан</span>
-            </div>
-            <button
-              onClick={() => { setEmailMode('merge'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
-              className="text-xs text-surface-500 hover:text-white transition-colors"
-            >
-              Объединить с другим аккаунтом
-            </button>
+        {user.email ? (
+          <div className="flex items-center gap-2 text-xs text-green-400">
+            <Check className="w-3.5 h-3.5" />
+            <span>Email привязан</span>
           </div>
         ) : (
           <>
-            {!user.email && (
-              <div className="flex gap-1 mb-2">
-                <button
-                  onClick={() => { setEmailMode('link'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
-                  className={`flex-1 text-xs py-1.5 rounded-lg transition-colors ${emailMode === 'link' ? 'bg-surface-700 text-white' : 'text-surface-500'}`}
-                >
-                  Новый email
-                </button>
-                <button
-                  onClick={() => { setEmailMode('merge'); setLinkEmailError(''); setLinkEmailSuccess(false) }}
-                  className={`flex-1 text-xs py-1.5 rounded-lg transition-colors ${emailMode === 'merge' ? 'bg-surface-700 text-white' : 'text-surface-500'}`}
-                >
-                  У меня есть аккаунт
-                </button>
-              </div>
-            )}
-            {emailMode === 'merge' && (
-              <p className="text-xs text-surface-500 mb-2">
-                Введите email и пароль от аккаунта на сайте — подписка и данные будут перенесены сюда
-              </p>
-            )}
             <div className="space-y-2">
               <input
                 type="email"
@@ -236,17 +207,7 @@ export default function SettingsPage() {
               <p className="text-red-400 text-xs">{linkEmailError}</p>
             )}
             {linkEmailSuccess && (
-              <p className="text-green-400 text-xs">
-                {emailMode === 'merge' ? 'Аккаунты успешно объединены' : 'Email успешно привязан'}
-              </p>
-            )}
-            {emailMode === 'merge' && user.email && (
-              <button
-                onClick={() => { setEmailMode('link'); setLinkEmailValue(''); setLinkPasswordValue(''); setLinkEmailError(''); setLinkEmailSuccess(false) }}
-                className="text-xs text-surface-500 hover:text-white transition-colors w-full text-center"
-              >
-                Отмена
-              </button>
+              <p className="text-green-400 text-xs">Email успешно привязан</p>
             )}
             <button
               onClick={() => {
@@ -255,8 +216,8 @@ export default function SettingsPage() {
                   setLinkEmailError('Заполните все поля')
                   return
                 }
-                if (emailMode === 'link' && linkPasswordValue.length < 8) {
-                  setLinkEmailError('Пароль должен содержать минимум 8 символов')
+                if (linkPasswordValue.length < 6) {
+                  setLinkEmailError('Пароль должен содержать минимум 6 символов')
                   return
                 }
                 linkEmailMutation.mutate()
@@ -264,13 +225,20 @@ export default function SettingsPage() {
               disabled={linkEmailMutation.isPending}
               className="btn-primary w-full text-sm"
             >
-              {linkEmailMutation.isPending
-                ? (emailMode === 'merge' ? 'Объединение...' : 'Привязка...')
-                : (emailMode === 'merge' ? 'Объединить аккаунты' : 'Привязать email')}
+              {linkEmailMutation.isPending ? 'Привязка...' : 'Привязать email'}
             </button>
           </>
         )}
       </div>
+
+      {/* Logout */}
+      <button
+        onClick={() => setShowLogout(true)}
+        className="glass-card p-4 w-full flex items-center gap-3 hover:bg-red-500/10 transition-colors"
+      >
+        <LogOut className="w-5 h-5 text-red-400" />
+        <span className="text-sm font-medium text-red-400">Выйти из аккаунта</span>
+      </button>
 
       {/* Unbind confirmation */}
       <Modal open={showUnbind} onClose={() => setShowUnbind(false)} title="Отвязать карту?">
@@ -287,6 +255,27 @@ export default function SettingsPage() {
             className="flex-1 bg-red-500/15 text-red-400 border border-red-500/20 font-semibold rounded-xl px-6 py-3 transition-all hover:bg-red-500/25 active:scale-[0.98]"
           >
             {unbindMutation.isPending ? 'Удаление...' : 'Отвязать'}
+          </button>
+        </div>
+      </Modal>
+
+      {/* Logout confirmation */}
+      <Modal open={showLogout} onClose={() => setShowLogout(false)} title="Выйти из аккаунта?">
+        <p className="text-sm text-surface-400 mb-4">
+          Вы уверены, что хотите выйти?
+        </p>
+        <div className="flex gap-2">
+          <button onClick={() => setShowLogout(false)} className="btn-secondary flex-1">
+            Отмена
+          </button>
+          <button
+            onClick={() => {
+              localStorage.removeItem('auth')
+              clearAuth()
+            }}
+            className="flex-1 bg-red-500/15 text-red-400 border border-red-500/20 font-semibold rounded-xl px-6 py-3 transition-all hover:bg-red-500/25 active:scale-[0.98]"
+          >
+            Выйти
           </button>
         </div>
       </Modal>

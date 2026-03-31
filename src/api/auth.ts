@@ -8,14 +8,6 @@ export async function loginWithTelegram(initData: string) {
   return data
 }
 
-export async function loginWithTelegramWidget(authData: Record<string, string>) {
-  const { data } = await api.post<{ token: string; telegram_id: number }>(
-    '/web/auth/telegram-login',
-    authData,
-  )
-  return data
-}
-
 export async function registerWithEmail(email: string, password: string, referralId?: number) {
   const { data } = await api.post<{ token: string; telegram_id: number }>(
     '/web/auth/register',
@@ -36,12 +28,3 @@ export async function linkEmail(email: string, password: string) {
   await api.post('/web/auth/link-email', { email, password })
 }
 
-export async function mergeEmailAccount(email: string, password: string) {
-  const { data } = await api.post('/web/auth/merge-email', { email, password })
-  return data
-}
-
-export async function generateLinkCode() {
-  const { data } = await api.post<{ code: string; deeplink: string }>('/web/auth/link-code')
-  return data
-}

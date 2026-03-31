@@ -102,9 +102,7 @@ export default function BuyPage() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-medium">Пробный период</p>
-              <p className="text-sm text-surface-400">
-                {isEmailUser ? '1 час доступа + 7 дней после привязки Telegram' : '7 дней бесплатно'}
-              </p>
+              <p className="text-sm text-surface-400">7 дней бесплатно</p>
             </div>
             <button
               onClick={() => { haptic?.selectionChanged(); trialMutation.mutate() }}
@@ -114,11 +112,6 @@ export default function BuyPage() {
               {trialMutation.isPending ? 'Активация...' : 'Активировать'}
             </button>
           </div>
-          {isEmailUser && !trialMutation.isSuccess && (
-            <p className="text-xs text-surface-500">
-              Установите VPN, зайдите в Telegram и привяжите аккаунт для полного пробного периода
-            </p>
-          )}
         </div>
       )}
 

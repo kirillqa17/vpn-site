@@ -12,7 +12,7 @@ export const MOCK_USER: User = {
   is_used_ref_bonus: false,
   username: 'demo_user',
   plan: 'base',
-  sub_link: 'https://sub.svoivpn.online/api/sub/example-uuid/happ',
+  sub_link: 'https://sub.svoi-connect.ru/api/sub/example-uuid/happ',
   payed_refs: 2,
   device_limit: 2,
   auto_renew: true,

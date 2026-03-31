@@ -62,7 +62,7 @@ export default function SetupPage() {
   }
 
   function getImportUrl() {
-    return `https://svoivpn.online/?redirect=happ://add/${encodeURIComponent(subLink)}`
+    return `https://svoi-connect.ru/?redirect=happ://add/${encodeURIComponent(subLink)}`
   }
 
   return (

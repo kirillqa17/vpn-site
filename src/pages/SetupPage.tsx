@@ -62,7 +62,7 @@ export default function SetupPage() {
   }
 
   function getImportUrl() {
-    return `happ://add/${subLink}`
+    return `https://svoi-connect.ru/?redirect=happ://add/${subLink}`
   }
 
   return (

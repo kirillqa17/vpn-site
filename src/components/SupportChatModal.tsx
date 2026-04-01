@@ -12,21 +12,76 @@ export default function SupportChatModal({ onClose }: Props) {
   const [sending, setSending] = useState(false)
   const [loading, setLoading] = useState(true)
   const [escalated, setEscalated] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [viewportHeight, setViewportHeight] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const sendingRef = useRef(false)
 
+  // Track sending state in ref for polling
+  useEffect(() => {
+    sendingRef.current = sending
+  }, [sending])
+
+  // Load history on mount
   useEffect(() => {
     loadHistory()
   }, [])
 
+  // Scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
+  // Handle mobile keyboard via visualViewport
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+
+    const handleResize = () => {
+      setViewportHeight(vv.height)
+    }
+
+    vv.addEventListener('resize', handleResize)
+    vv.addEventListener('scroll', handleResize)
+    handleResize()
+
+    return () => {
+      vv.removeEventListener('resize', handleResize)
+      vv.removeEventListener('scroll', handleResize)
+    }
+  }, [])
+
+  // Polling for new messages (admin replies)
+  useEffect(() => {
+    pollRef.current = setInterval(async () => {
+      if (sendingRef.current) return
+      try {
+        const history = await getSupportHistory()
+        setEscalated(history.escalated)
+        // Only update if server has more messages (avoid overwriting optimistic updates)
+        setMessages(prev => {
+          if (history.messages.length > prev.length) {
+            return history.messages
+          }
+          return prev
+        })
+      } catch {
+        // ignore polling errors
+      }
+    }, 5000)
+
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
+  }, [])
+
   const loadHistory = async () => {
     try {
       const history = await getSupportHistory()
-      setMessages(history)
+      setMessages(history.messages)
+      setEscalated(history.escalated)
     } catch {
       // No history yet
     } finally {
@@ -41,14 +96,22 @@ export default function SupportChatModal({ onClose }: Props) {
     setInput('')
     setSending(true)
 
+    // Reset textarea height
+    if (inputRef.current) {
+      inputRef.current.style.height = 'auto'
+    }
+
     // Add user message immediately
     const userMsg: SupportMessage = { role: 'user', content: text, created_at: new Date().toISOString() }
     setMessages(prev => [...prev, userMsg])
 
     try {
-      const response = await sendSupportMessage(text)
-      if (response) {
-        const aiMsg: SupportMessage = { role: 'ai', content: response, created_at: new Date().toISOString() }
+      const result = await sendSupportMessage(text)
+      if (result.escalated) {
+        setEscalated(true)
+        // No AI response when escalated
+      } else if (result.response) {
+        const aiMsg: SupportMessage = { role: 'ai', content: result.response, created_at: new Date().toISOString() }
         setMessages(prev => [...prev, aiMsg])
       }
     } catch {
@@ -61,7 +124,7 @@ export default function SupportChatModal({ onClose }: Props) {
   }
 
   const handleEscalate = async () => {
-    if (escalated) return
+    setShowConfirm(false)
     try {
       await escalateSupport()
       setEscalated(true)
@@ -91,18 +154,31 @@ export default function SupportChatModal({ onClose }: Props) {
     return 'AI'
   }
 
+  // Use visualViewport height if available (fixes mobile keyboard)
+  const containerStyle: React.CSSProperties = viewportHeight
+    ? { position: 'fixed', top: 0, left: 0, right: 0, height: viewportHeight, zIndex: 50 }
+    : {}
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-surface-950">
+    <div
+      className={`flex flex-col bg-surface-950 ${!viewportHeight ? 'fixed inset-0 z-50' : ''}`}
+      style={containerStyle}
+    >
       {/* Header */}
       <div className="shrink-0 flex items-center justify-between px-4 py-3 border-b border-surface-800">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-emerald-400" />
           <span className="text-sm font-medium">Поддержка</span>
+          {escalated && (
+            <span className="text-[10px] bg-orange-500/20 text-orange-400 px-1.5 py-0.5 rounded-full">
+              Ожидание оператора
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {!escalated && (
             <button
-              onClick={handleEscalate}
+              onClick={() => setShowConfirm(true)}
               className="flex items-center gap-1 text-xs text-surface-400 hover:text-orange-400 transition-colors px-2 py-1 rounded-lg hover:bg-surface-800"
             >
               <AlertTriangle className="w-3.5 h-3.5" />
@@ -114,6 +190,28 @@ export default function SupportChatModal({ onClose }: Props) {
           </button>
         </div>
       </div>
+
+      {/* Confirmation dialog */}
+      {showConfirm && (
+        <div className="shrink-0 px-4 py-3 bg-orange-500/10 border-b border-orange-500/20">
+          <p className="text-sm text-orange-300 mb-2">Позвать оператора?</p>
+          <p className="text-xs text-surface-400 mb-3">AI-ассистент перестанет отвечать. Оператор подключится в ближайшее время.</p>
+          <div className="flex gap-2">
+            <button
+              onClick={handleEscalate}
+              className="flex-1 bg-orange-500 text-white text-sm py-2 rounded-lg active:bg-orange-600 transition-colors"
+            >
+              Да, позвать
+            </button>
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="flex-1 bg-surface-800 text-surface-300 text-sm py-2 rounded-lg active:bg-surface-700 transition-colors"
+            >
+              Отмена
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
@@ -149,7 +247,7 @@ export default function SupportChatModal({ onClose }: Props) {
             )
           })
         )}
-        {sending && (
+        {sending && !escalated && (
           <div className="flex items-start gap-1">
             <div className="text-[10px] text-surface-500 flex items-center gap-1">
               <Bot className="w-3 h-3" />
@@ -175,13 +273,19 @@ export default function SupportChatModal({ onClose }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Напишите сообщение..."
+            placeholder={escalated ? 'Сообщение оператору...' : 'Напишите сообщение...'}
             rows={1}
             className="flex-1 bg-surface-800 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-surface-500 resize-none outline-none max-h-32 min-h-[40px]"
             onInput={(e) => {
               const t = e.target as HTMLTextAreaElement
               t.style.height = 'auto'
               t.style.height = Math.min(t.scrollHeight, 128) + 'px'
+            }}
+            onFocus={() => {
+              // Scroll input into view on mobile
+              setTimeout(() => {
+                inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+              }, 300)
             }}
           />
           <button

@@ -6,14 +6,24 @@ export interface SupportMessage {
   created_at: string
 }
 
-export async function getSupportHistory(): Promise<SupportMessage[]> {
-  const { data } = await api.get<{ messages: SupportMessage[] }>('/web/support/history')
-  return data.messages
+export interface SupportHistory {
+  messages: SupportMessage[]
+  escalated: boolean
 }
 
-export async function sendSupportMessage(message: string): Promise<string> {
-  const { data } = await api.post<{ response: string }>('/web/support/chat', { message })
-  return data.response
+export interface ChatResponse {
+  response: string | null
+  escalated?: boolean
+}
+
+export async function getSupportHistory(): Promise<SupportHistory> {
+  const { data } = await api.get<SupportHistory>('/web/support/history')
+  return data
+}
+
+export async function sendSupportMessage(message: string): Promise<ChatResponse> {
+  const { data } = await api.post<ChatResponse>('/web/support/chat', { message })
+  return data
 }
 
 export async function escalateSupport(): Promise<void> {

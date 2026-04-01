@@ -69,6 +69,24 @@ export default function SetupPage() {
     <div className="space-y-4 animate-fade-in">
       <h1 className="text-xl font-bold">Установка</h1>
 
+      {/* Subscription link */}
+      {subLink && (
+        <div className="glass-card p-4">
+          <p className="text-xs text-surface-400 mb-2">Ваша подписная ссылка</p>
+          <div className="flex gap-2">
+            <code className="flex-1 bg-surface-800 rounded-lg px-3 py-2 text-xs text-surface-300 overflow-hidden text-ellipsis whitespace-nowrap">
+              {subLink}
+            </code>
+            <button
+              onClick={copyLink}
+              className="btn-secondary px-3 py-2"
+            >
+              {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Trial instructions banner */}
       {isTrialRedirect && (
         <div className="glass-card p-4 space-y-3 border border-emerald-500/20">

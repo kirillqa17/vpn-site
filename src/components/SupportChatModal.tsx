@@ -156,12 +156,12 @@ export default function SupportChatModal({ onClose }: Props) {
 
   // Use visualViewport height if available (fixes mobile keyboard)
   const containerStyle: React.CSSProperties = viewportHeight
-    ? { position: 'fixed', top: 0, left: 0, right: 0, height: viewportHeight, zIndex: 50 }
+    ? { position: 'fixed', top: 0, left: 0, right: 0, height: viewportHeight, zIndex: 60 }
     : {}
 
   return (
     <div
-      className={`flex flex-col bg-surface-950 ${!viewportHeight ? 'fixed inset-0 z-50' : ''}`}
+      className={`flex flex-col bg-surface-950 ${!viewportHeight ? 'fixed inset-0 z-[60]' : ''}`}
       style={containerStyle}
     >
       {/* Header */}

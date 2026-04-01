@@ -71,13 +71,13 @@ export default function SetupPage() {
 
       {/* Trial instructions banner */}
       {isTrialRedirect && (
-        <div className="glass-card p-4 space-y-3 border border-amber-500/20">
-          <div className="flex items-center gap-2 text-amber-400">
+        <div className="glass-card p-4 space-y-3 border border-emerald-500/20">
+          <div className="flex items-center gap-2 text-emerald-400">
             <Clock className="w-4 h-4" />
-            <p className="text-sm font-medium">У вас 1 час VPN-доступа</p>
+            <p className="text-sm font-medium">Пробный период активирован (7 дней)</p>
           </div>
           <p className="text-xs text-surface-400">
-            Установите VPN по инструкции ниже, затем привяжите Telegram для полного пробного периода на 7 дней
+            Установите VPN по инструкции ниже и подключайтесь
           </p>
         </div>
       )}

@@ -50,15 +50,9 @@ jobs:
             echo "Starting vpn-web..."
             docker run -d \
               --name vpn-web \
-              --network remnawave-network \
+              -p 3080:80 \
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
-
-            echo "Connecting to vpn-net..."
-            docker network connect vpn-net vpn-web
-
-            echo "Reloading remnawave-nginx..."
-            docker exec remnawave-nginx nginx -s reload || true
 
             echo "Verifying container started..."
             sleep 3

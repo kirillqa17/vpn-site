@@ -230,9 +230,10 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Auth form — absolute center of viewport */}
-      <div className="fixed inset-0 flex flex-col items-center justify-center px-4 py-8 z-10 pointer-events-none">
-      <div className="pointer-events-auto">
+      {/* Auth form — centered on desktop (fixed overlay), normal flow on mobile */}
+      <div className="flex flex-col items-center justify-center px-4 py-8 min-h-screen
+                      lg:fixed lg:inset-0 lg:z-10 lg:pointer-events-none">
+      <div className="lg:pointer-events-auto">
       <div className="max-w-sm w-full text-center space-y-8">
         <div className="space-y-3">
           <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />

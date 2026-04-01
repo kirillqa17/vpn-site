@@ -182,10 +182,10 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row items-center lg:items-start justify-center px-4 lg:px-8 py-8 gap-8">
-      {/* News sidebar — LEFT on desktop, BOTTOM on mobile */}
+    <div className="min-h-screen bg-surface-950 relative">
+      {/* News sidebar — fixed left on desktop, below form on mobile */}
       {news.length > 0 && (
-        <div className="max-w-sm w-full space-y-3 order-2 lg:order-1 lg:max-h-[90vh] lg:overflow-y-auto lg:sticky lg:top-8 scrollbar-hide">
+        <div className="hidden lg:block fixed left-0 top-0 w-[340px] h-screen overflow-y-auto p-6 space-y-3 scrollbar-hide">
           <div className="flex items-center gap-2 text-surface-400">
             <Newspaper className="w-4 h-4" />
             <span className="text-sm font-medium">Новости</span>
@@ -220,8 +220,9 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Auth form — CENTER on desktop, TOP on mobile */}
-      <div className="max-w-sm w-full text-center space-y-8 order-1 lg:order-2 lg:flex-shrink-0">
+      {/* Auth form — always centered */}
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      <div className="max-w-sm w-full text-center space-y-8">
         <div className="space-y-3">
           <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />
           <h1 className="text-3xl font-bold tracking-tight">SvoiVPN</h1>
@@ -380,6 +381,31 @@ export default function LoginPage() {
             className="hover:text-white transition-colors">Новости</a>
         </div>
       </div>
+
+      </div>
+
+      {/* News on mobile — below form */}
+      {news.length > 0 && (
+        <div className="lg:hidden max-w-sm w-full space-y-3 px-4 pb-8 mx-auto">
+          <div className="flex items-center gap-2 text-surface-400">
+            <Newspaper className="w-4 h-4" />
+            <span className="text-sm font-medium">Новости</span>
+          </div>
+          {news.slice(0, 5).map((post) => {
+            const isExpanded = expandedPost === post.id
+            const isLong = post.text.length > 120
+            return (
+              <div key={post.id} className="glass-card p-4 space-y-2 text-left cursor-pointer" onClick={() => setExpandedPost(isExpanded ? null : post.id)}>
+                <p className={`text-sm text-surface-200 whitespace-pre-wrap leading-relaxed ${!isExpanded && isLong ? 'line-clamp-3' : ''}`}>{post.text}</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-[10px] text-surface-500">{new Date(post.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}</p>
+                  {isLong && (isExpanded ? <ChevronUp className="w-3.5 h-3.5 text-surface-500" /> : <ChevronDown className="w-3.5 h-3.5 text-surface-500" />)}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      )}
 
       <SupportChatWidget />
     </div>

@@ -59,6 +59,9 @@ export async function sendSupportMessage(message: string): Promise<ChatResponse>
 export async function escalateSupport(): Promise<void> {
   if (isAuthenticated()) {
     await api.post('/web/support/escalate')
+  } else {
+    await axios.post('/api/web/support/public/escalate', {
+      session_id: getSessionId(),
+    })
   }
-  // No escalation for anonymous users — they can use TG bot
 }

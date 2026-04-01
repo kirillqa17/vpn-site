@@ -114,8 +114,10 @@ export default function SupportChatModal({ onClose }: Props) {
         const aiMsg: SupportMessage = { role: 'ai', content: result.response, created_at: new Date().toISOString() }
         setMessages(prev => [...prev, aiMsg])
       }
-    } catch {
-      const errMsg: SupportMessage = { role: 'ai', content: 'Не удалось получить ответ. Попробуйте позже.', created_at: new Date().toISOString() }
+    } catch (err: any) {
+      const is401 = err?.response?.status === 401
+      const errText = is401 ? 'Сессия истекла. Перезайдите в аккаунт.' : 'Не удалось получить ответ. Попробуйте позже.'
+      const errMsg: SupportMessage = { role: 'ai', content: errText, created_at: new Date().toISOString() }
       setMessages(prev => [...prev, errMsg])
     } finally {
       setSending(false)

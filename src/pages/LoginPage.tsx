@@ -182,7 +182,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row items-center lg:items-start justify-center px-4 py-8 gap-8">
+    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row items-center lg:items-start lg:justify-between justify-center px-4 lg:px-8 py-8 gap-8">
       {/* News sidebar — LEFT on desktop, BOTTOM on mobile */}
       {news.length > 0 && (
         <div className="max-w-sm w-full space-y-3 order-2 lg:order-1 lg:max-h-[90vh] lg:overflow-y-auto lg:sticky lg:top-8 scrollbar-hide">

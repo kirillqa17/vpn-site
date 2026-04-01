@@ -182,7 +182,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row items-center lg:items-start lg:justify-between justify-center px-4 lg:px-8 py-8 gap-8">
+    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row items-center lg:items-start justify-center px-4 lg:px-8 py-8 gap-8">
       {/* News sidebar — LEFT on desktop, BOTTOM on mobile */}
       {news.length > 0 && (
         <div className="max-w-sm w-full space-y-3 order-2 lg:order-1 lg:max-h-[90vh] lg:overflow-y-auto lg:sticky lg:top-8 scrollbar-hide">
@@ -220,8 +220,8 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Auth form — RIGHT on desktop, TOP on mobile */}
-      <div className="max-w-sm w-full text-center space-y-8 order-1 lg:order-2">
+      {/* Auth form — CENTER on desktop, TOP on mobile */}
+      <div className="max-w-sm w-full text-center space-y-8 order-1 lg:order-2 lg:flex-shrink-0">
         <div className="space-y-3">
           <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />
           <h1 className="text-3xl font-bold tracking-tight">SvoiVPN</h1>

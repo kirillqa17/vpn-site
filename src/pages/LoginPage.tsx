@@ -5,6 +5,7 @@ import { loginWithEmail, registerWithEmail, verifyEmail, forgotPassword, resetPa
 import { getNews, type NewsPost } from '../api/news'
 import { BOT_USERNAME } from '../utils/constants'
 import SupportChatWidget from '../components/SupportChatWidget'
+import axios from 'axios'
 
 type Screen = 'login' | 'register' | 'verify' | 'forgot' | 'reset'
 
@@ -23,9 +24,13 @@ export default function LoginPage() {
   const [resendTimer, setResendTimer] = useState(0)
   const [news, setNews] = useState<NewsPost[]>([])
   const [expandedPost, setExpandedPost] = useState<number | null>(null)
+  const [maintenance, setMaintenance] = useState<{ enabled: boolean; message: string }>({ enabled: false, message: '' })
 
   useEffect(() => {
     getNews().then(setNews).catch(() => {})
+    axios.get('/api/app/maintenance').then(({ data }) => {
+      setMaintenance({ enabled: data.maintenance, message: data.message || 'Ведутся технические работы' })
+    }).catch(() => {})
   }, [])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
@@ -183,6 +188,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-surface-950 relative">
+      {maintenance.enabled && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-red-500/90 text-white text-center text-sm py-2 px-4">
+          {maintenance.message}
+        </div>
+      )}
       {/* News sidebar — fixed left on desktop, below form on mobile */}
       {news.length > 0 && (
         <div className="hidden lg:block fixed left-0 top-0 w-[340px] h-screen overflow-y-auto p-6 space-y-3 scrollbar-hide">

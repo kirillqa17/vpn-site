@@ -57,6 +57,10 @@ jobs:
               --restart unless-stopped \
               ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
 
+            echo "Clearing nginx cache..."
+            rm -rf /tmp/nginx_cache/*
+            nginx -s reload 2>/dev/null || true
+
             echo "Verifying container started..."
             sleep 3
             if docker ps | grep -q vpn-web; then

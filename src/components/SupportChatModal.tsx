@@ -275,6 +275,9 @@ export default function SupportChatModal({ onClose }: Props) {
             onKeyDown={handleKeyDown}
             placeholder={escalated ? 'Сообщение оператору...' : 'Напишите сообщение...'}
             rows={1}
+            autoComplete="off"
+            autoCorrect="off"
+            enterKeyHint="send"
             className="flex-1 bg-surface-800 rounded-2xl px-4 py-2.5 text-sm text-white placeholder-surface-500 resize-none outline-none max-h-32 min-h-[40px]"
             onInput={(e) => {
               const t = e.target as HTMLTextAreaElement

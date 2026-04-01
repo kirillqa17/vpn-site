@@ -220,8 +220,9 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Auth form — absolute center of screen */}
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative z-10">
+      {/* Auth form — absolute center of viewport */}
+      <div className="fixed inset-0 flex flex-col items-center justify-center px-4 py-8 z-10 pointer-events-none">
+      <div className="pointer-events-auto">
       <div className="max-w-sm w-full text-center space-y-8">
         <div className="space-y-3">
           <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />
@@ -382,6 +383,7 @@ export default function LoginPage() {
         </div>
       </div>
 
+      </div>
       </div>
 
       {/* News on mobile — below form */}

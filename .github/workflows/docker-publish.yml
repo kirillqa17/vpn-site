@@ -40,12 +40,15 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            echo "Pulling latest Docker image..."
-            docker pull ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
-
             echo "Stopping existing container (if any)..."
             docker stop vpn-web || true
             docker rm vpn-web || true
+
+            echo "Removing old image to force fresh pull..."
+            docker rmi ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest || true
+
+            echo "Pulling latest Docker image..."
+            docker pull ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
 
             echo "Starting vpn-web..."
             docker run -d \

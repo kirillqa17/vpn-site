@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore'
 import { loginWithEmail, registerWithEmail, verifyEmail, forgotPassword, resetPassword, telegramInit, telegramCheck } from '../api/auth'
 import { getNews, type NewsPost } from '../api/news'
 import { BOT_USERNAME } from '../utils/constants'
-import SupportChatWidget from '../components/SupportChatWidget'
+// SupportChatWidget requires auth — on login page use direct TG link instead
 import axios from 'axios'
 
 type Screen = 'login' | 'register' | 'verify' | 'forgot' | 'reset'
@@ -456,7 +456,16 @@ export default function LoginPage() {
         </div>
       )}
 
-      <SupportChatWidget />
+      {/* Support link for non-authenticated users */}
+      <a
+        href="https://t.me/svoivpn_help_bot"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-20 right-4 z-40 w-13 h-13 rounded-full bg-white text-black shadow-lg flex items-center justify-center hover:scale-105 active:scale-95 transition-transform"
+        style={{ width: 52, height: 52 }}
+      >
+        <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </a>
     </div>
   )
 }

@@ -52,3 +52,16 @@ export async function linkEmail(email: string, password: string) {
   await api.post('/web/auth/link-email', { email, password })
 }
 
+export async function telegramInit(): Promise<string> {
+  const { data } = await api.post<{ code: string }>('/web/auth/telegram-init')
+  return data.code
+}
+
+export async function telegramCheck(code: string): Promise<{ token: string; telegram_id: number } | null> {
+  const { data } = await api.get<{ token?: string; telegram_id?: number; status?: string }>(`/web/auth/telegram-check/${code}`)
+  if (data.token && data.telegram_id) {
+    return { token: data.token, telegram_id: data.telegram_id }
+  }
+  return null
+}
+

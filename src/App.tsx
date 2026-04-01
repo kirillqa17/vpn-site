@@ -10,6 +10,7 @@ import DevicesPage from './pages/DevicesPage'
 import SetupPage from './pages/SetupPage'
 import ReferralPage from './pages/ReferralPage'
 import SettingsPage from './pages/SettingsPage'
+import NewsPage from './pages/NewsPage'
 import LoginPage from './pages/LoginPage'
 import Spinner from './components/ui/Spinner'
 
@@ -67,6 +68,7 @@ export default function App() {
         <Route path="/devices" element={<DevicesPage />} />
         <Route path="/setup" element={<SetupPage />} />
         <Route path="/referral" element={<ReferralPage />} />
+        <Route path="/news" element={<NewsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />

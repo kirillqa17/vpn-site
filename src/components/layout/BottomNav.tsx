@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
-import { Home, ShoppingCart, Smartphone, Settings, Users } from 'lucide-react'
+import { Home, ShoppingCart, Smartphone, Settings, Users, Newspaper } from 'lucide-react'
 import { useTelegram } from '../../hooks/useTelegram'
 
 const NAV_ITEMS = [
@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { path: '/buy', icon: ShoppingCart, label: 'Тарифы' },
   { path: '/devices', icon: Smartphone, label: 'Устройства' },
   { path: '/referral', icon: Users, label: 'Рефералы' },
+  { path: '/news', icon: Newspaper, label: 'Новости' },
   { path: '/settings', icon: Settings, label: 'Настройки' },
 ]
 

@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTelegram } from '../../hooks/useTelegram'
 import BottomNav from './BottomNav'
+import SupportChatWidget from '../SupportChatWidget'
 import { useEffect } from 'react'
 
 export default function AppShell() {
@@ -44,6 +45,7 @@ export default function AppShell() {
         <Outlet />
       </main>
 
+      <SupportChatWidget />
       <BottomNav />
     </div>
   )

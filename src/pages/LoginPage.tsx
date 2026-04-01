@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Mail, Eye, EyeOff, ArrowLeft } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { loginWithEmail, registerWithEmail, verifyEmail, forgotPassword, resetPassword } from '../api/auth'
@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [resendTimer, setResendTimer] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const referralId = (() => {
@@ -25,6 +26,31 @@ export default function LoginPage() {
     const ref = params.get('ref')
     return ref ? parseInt(ref, 10) : undefined
   })()
+
+  const startResendTimer = useCallback(() => {
+    setResendTimer(60)
+  }, [])
+
+  useEffect(() => {
+    if (resendTimer <= 0) return
+    const interval = setInterval(() => setResendTimer(t => t - 1), 1000)
+    return () => clearInterval(interval)
+  }, [resendTimer])
+
+  const handleResendCode = async () => {
+    if (resendTimer > 0) return
+    try {
+      if (screen === 'verify') {
+        await registerWithEmail(email, password)
+      } else if (screen === 'reset') {
+        await forgotPassword(email)
+      }
+      startResendTimer()
+      setInfo('Код отправлен повторно')
+    } catch (err: any) {
+      setError(parseError(err, 'Не удалось отправить код'))
+    }
+  }
 
   const parseError = (err: any, fallback: string) => {
     const data = err?.response?.data
@@ -73,6 +99,7 @@ export default function LoginPage() {
     try {
       await registerWithEmail(email, password, referralId)
       setScreen('verify')
+      startResendTimer()
       setInfo(`Код подтверждения отправлен на ${email}`)
       setError('')
     } catch (err: any) {
@@ -108,6 +135,7 @@ export default function LoginPage() {
     try {
       await forgotPassword(email)
       setScreen('reset')
+      startResendTimer()
       setInfo(`Код для сброса пароля отправлен на ${email}`)
       setError('')
     } catch (err: any) {
@@ -229,9 +257,14 @@ export default function LoginPage() {
               <input type="text" placeholder="Код подтверждения" value={code} maxLength={6}
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                 className="input-field text-center text-2xl tracking-[0.3em]" autoComplete="one-time-code" />
+              <p className="text-surface-500 text-[11px]">Проверьте папку Спам, если письмо не пришло</p>
               {error && <p className="text-red-400 text-xs">{error}</p>}
               <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
                 {isSubmitting ? 'Проверка...' : 'Подтвердить'}
+              </button>
+              <button type="button" onClick={handleResendCode} disabled={resendTimer > 0}
+                className="text-xs text-surface-400 hover:text-white transition-colors w-full">
+                {resendTimer > 0 ? `Отправить ещё раз (${resendTimer}с)` : 'Отправить код ещё раз'}
               </button>
             </form>
           )}
@@ -256,9 +289,14 @@ export default function LoginPage() {
                 className="input-field text-center text-2xl tracking-[0.3em]" autoComplete="one-time-code" />
               <input type="password" placeholder="Новый пароль" value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)} className="input-field" autoComplete="new-password" />
+              <p className="text-surface-500 text-[11px]">Проверьте папку Спам, если письмо не пришло</p>
               {error && <p className="text-red-400 text-xs">{error}</p>}
               <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
                 {isSubmitting ? 'Сброс...' : 'Сбросить пароль'}
+              </button>
+              <button type="button" onClick={handleResendCode} disabled={resendTimer > 0}
+                className="text-xs text-surface-400 hover:text-white transition-colors w-full">
+                {resendTimer > 0 ? `Отправить ещё раз (${resendTimer}с)` : 'Отправить код ещё раз'}
               </button>
             </form>
           )}

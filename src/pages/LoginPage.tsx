@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react'
-import { Mail, Eye, EyeOff, ArrowLeft } from 'lucide-react'
+import { Mail, Eye, EyeOff, ArrowLeft, Newspaper } from 'lucide-react'
 import { useAuthStore } from '../stores/authStore'
 import { loginWithEmail, registerWithEmail, verifyEmail, forgotPassword, resetPassword } from '../api/auth'
+import { getNews, type NewsPost } from '../api/news'
 import { BOT_USERNAME } from '../utils/constants'
 
 type Screen = 'login' | 'register' | 'verify' | 'forgot' | 'reset'
@@ -19,6 +20,11 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
   const [resendTimer, setResendTimer] = useState(0)
+  const [news, setNews] = useState<NewsPost[]>([])
+
+  useEffect(() => {
+    getNews().then(setNews).catch(() => {})
+  }, [])
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const referralId = (() => {
@@ -174,7 +180,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-surface-950 flex flex-col items-center justify-center px-4">
+    <div className="min-h-screen bg-surface-950 flex flex-col lg:flex-row items-center lg:items-start justify-center px-4 py-8 gap-8">
       <div className="max-w-sm w-full text-center space-y-8">
         <div className="space-y-3">
           <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />
@@ -334,6 +340,28 @@ export default function LoginPage() {
             className="hover:text-white transition-colors">Новости</a>
         </div>
       </div>
+
+      {/* News sidebar / bottom section */}
+      {news.length > 0 && (
+        <div className="max-w-sm w-full space-y-3 lg:max-h-[80vh] lg:overflow-y-auto">
+          <div className="flex items-center gap-2 text-surface-400">
+            <Newspaper className="w-4 h-4" />
+            <span className="text-sm font-medium">Новости</span>
+          </div>
+          {news.slice(0, 5).map((post) => (
+            <div key={post.id} className="glass-card p-4 space-y-2 text-left">
+              <p className="text-sm text-surface-200 whitespace-pre-wrap leading-relaxed line-clamp-4">
+                {post.text}
+              </p>
+              <p className="text-[10px] text-surface-500">
+                {new Date(post.date).toLocaleDateString('ru-RU', {
+                  day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
+                })}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

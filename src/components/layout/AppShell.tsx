@@ -2,13 +2,21 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useTelegram } from '../../hooks/useTelegram'
 import BottomNav from './BottomNav'
 import SupportChatWidget from '../SupportChatWidget'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 
 export default function AppShell() {
   const { isMiniApp, tg } = useTelegram()
   const location = useLocation()
   const navigate = useNavigate()
   const isRoot = location.pathname === '/'
+  const [maintenance, setMaintenance] = useState<{ enabled: boolean; message: string }>({ enabled: false, message: '' })
+
+  useEffect(() => {
+    axios.get('/api/app/maintenance').then(({ data }) => {
+      setMaintenance({ enabled: data.maintenance, message: data.message || 'Ведутся технические работы' })
+    }).catch(() => {})
+  }, [])
 
   useEffect(() => {
     if (!isMiniApp || !tg) return
@@ -39,6 +47,12 @@ export default function AppShell() {
             </button>
           </div>
         </header>
+      )}
+
+      {maintenance.enabled && (
+        <div className="bg-red-500/90 text-white text-center text-sm py-2 px-4">
+          {maintenance.message}
+        </div>
       )}
 
       <main className="flex-1 max-w-lg mx-auto w-full px-4 py-6 pb-24">

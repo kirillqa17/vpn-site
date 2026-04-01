@@ -57,7 +57,12 @@ export default function App() {
   }
 
   if (!isAuthenticated) {
-    return <LoginPage />
+    return (
+      <Routes>
+        <Route path="/news" element={<NewsPage />} />
+        <Route path="*" element={<LoginPage />} />
+      </Routes>
+    )
   }
 
   return (

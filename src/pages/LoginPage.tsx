@@ -220,8 +220,8 @@ export default function LoginPage() {
         </div>
       )}
 
-      {/* Auth form — always centered */}
-      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
+      {/* Auth form — absolute center of screen */}
+      <div className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative z-10">
       <div className="max-w-sm w-full text-center space-y-8">
         <div className="space-y-3">
           <img src="/logo.jpg" alt="SvoiVPN" className="w-20 h-20 mx-auto rounded-2xl" />

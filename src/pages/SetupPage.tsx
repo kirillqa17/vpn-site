@@ -50,6 +50,17 @@ export default function SetupPage() {
     }
   }
 
+  function openImport() {
+    const deepLink = `happ://add/${subLink}`
+    if (isMiniApp && tg) {
+      // In TG mini app — use redirect wrapper
+      tg.openLink(`https://svoi-connect.ru/?redirect=${deepLink}`)
+    } else {
+      // On website — direct deep link via location.href
+      window.location.href = deepLink
+    }
+  }
+
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(subLink)
@@ -145,7 +156,7 @@ export default function SetupPage() {
               Нажмите кнопку ниже для автоматического импорта
             </p>
             <button
-              onClick={() => openLink(getImportUrl())}
+              onClick={openImport}
               className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
             >
               Импортировать конфиг

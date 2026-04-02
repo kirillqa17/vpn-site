@@ -18,7 +18,7 @@ export default function BottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-surface-950/90 backdrop-blur-xl border-t border-surface-800 safe-area-bottom">
-      <div className="max-w-lg mx-auto flex items-center justify-around h-16 px-2">
+      <div className="max-w-lg mx-auto flex items-center justify-around h-16 px-1">
         {NAV_ITEMS.map(({ path, icon: Icon, label }) => {
           const isActive = pathname === path
           return (
@@ -28,7 +28,7 @@ export default function BottomNav() {
                 haptic?.selectionChanged()
                 navigate(path)
               }}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all duration-200 ${
+              className={`flex flex-col items-center gap-0.5 min-w-0 px-1.5 py-1.5 rounded-xl transition-all duration-200 ${
                 isActive
                   ? 'text-white'
                   : 'text-surface-500 hover:text-surface-300'

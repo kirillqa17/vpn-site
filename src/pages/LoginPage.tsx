@@ -185,7 +185,12 @@ export default function LoginPage() {
     setInfo('Откройте бота в Telegram и нажмите Start...')
     try {
       const authCode = await telegramInit()
-      window.open(`https://t.me/${BOT_USERNAME}?start=web_auth_${authCode}`, '_blank')
+      // Use tg:// deep link for better iOS compatibility
+      const tgLink = `tg://resolve?domain=${BOT_USERNAME}&start=web_auth_${authCode}`
+      const webLink = `https://t.me/${BOT_USERNAME}?start=web_auth_${authCode}`
+      // Try tg:// first (works better on mobile), fallback to https
+      window.location.href = tgLink
+      setTimeout(() => { window.open(webLink, '_blank') }, 2000)
 
       // Poll for confirmation
       for (let i = 0; i < 60; i++) {

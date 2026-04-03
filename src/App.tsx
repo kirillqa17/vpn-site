@@ -12,6 +12,7 @@ import ReferralPage from './pages/ReferralPage'
 import SettingsPage from './pages/SettingsPage'
 import NewsPage from './pages/NewsPage'
 import LoginPage from './pages/LoginPage'
+import PrivacyPage from './pages/PrivacyPage'
 import Spinner from './components/ui/Spinner'
 
 export default function App() {
@@ -60,6 +61,7 @@ export default function App() {
     return (
       <Routes>
         <Route path="/news" element={<NewsPage />} />
+        <Route path="/privacy" element={<PrivacyPage />} />
         <Route path="*" element={<LoginPage />} />
       </Routes>
     )
@@ -76,6 +78,7 @@ export default function App() {
         <Route path="/news" element={<NewsPage />} />
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
+      <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

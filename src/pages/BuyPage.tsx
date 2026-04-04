@@ -61,7 +61,7 @@ export default function BuyPage() {
       if (isMiniApp && tg) {
         tg.openLink(payment_url)
       } else {
-        window.open(payment_url, '_blank')
+        window.location.href = payment_url
       }
     } catch {
       haptic?.notificationOccurred('error')
@@ -83,7 +83,7 @@ export default function BuyPage() {
       if (isMiniApp && tg) {
         tg.openLink(invoice_url)
       } else {
-        window.open(invoice_url, '_blank')
+        window.location.href = invoice_url
       }
     } catch {
       haptic?.notificationOccurred('error')

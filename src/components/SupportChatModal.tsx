@@ -108,8 +108,11 @@ export default function SupportChatModal({ onClose }: Props) {
     try {
       const result = await sendSupportMessage(text)
       if (result.escalated) {
+        if (!escalated) {
+          // First escalation — notify admin
+          try { await escalateSupport() } catch {}
+        }
         setEscalated(true)
-        // No AI response when escalated
       } else if (result.response) {
         const aiMsg: SupportMessage = { role: 'ai', content: result.response, created_at: new Date().toISOString() }
         setMessages(prev => [...prev, aiMsg])

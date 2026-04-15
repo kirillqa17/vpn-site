@@ -20,6 +20,8 @@ export interface User {
   is_pro: boolean
   card_last4: string
   email?: string
+  first_purchase_bonus_eligible?: boolean
+  first_purchase_bonus_days_left?: number | null
 }
 
 export interface Device {

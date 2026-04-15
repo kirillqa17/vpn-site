@@ -7,6 +7,7 @@ import { getMe } from '../api/user'
 import { TARIFF_NAMES, TARIFF_FEATURES, DURATION_LABELS } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
 import Modal from '../components/ui/Modal'
+import FirstPurchaseBonusBanner from '../components/FirstPurchaseBonusBanner'
 
 const TARIFFS = ['base', 'family', 'bsbase', 'bsfamily'] as const
 const DURATIONS = ['1m', '3m', '1y'] as const
@@ -95,6 +96,11 @@ export default function BuyPage() {
   return (
     <div className="space-y-5 animate-fade-in">
       <h1 className="text-xl font-bold">Тарифы</h1>
+
+      <FirstPurchaseBonusBanner
+        eligible={user?.first_purchase_bonus_eligible}
+        daysLeft={user?.first_purchase_bonus_days_left}
+      />
 
       {/* Trial */}
       {user && !user.is_used_trial && (

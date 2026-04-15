@@ -6,6 +6,7 @@ import { formatDate, daysUntil, isExpired, isExpiringSoon } from '../utils/forma
 import { TARIFF_NAMES } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
 import Spinner from '../components/ui/Spinner'
+import FirstPurchaseBonusBanner from '../components/FirstPurchaseBonusBanner'
 
 export default function DashboardPage() {
   const navigate = useNavigate()
@@ -41,6 +42,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-4 animate-fade-in">
+      <FirstPurchaseBonusBanner
+        eligible={user.first_purchase_bonus_eligible}
+        daysLeft={user.first_purchase_bonus_days_left}
+      />
+
       {/* Status Card */}
       <div className="glass-card p-5">
         <div className="flex items-center justify-between mb-4">

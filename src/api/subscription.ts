@@ -70,3 +70,38 @@ export async function unbindCard(): Promise<void> {
   if (isDev) return
   await api.delete('/web/settings/payment-method')
 }
+
+// ─────────────────────────────────────────────────────────────
+// Email notification preferences
+// ─────────────────────────────────────────────────────────────
+
+export interface NotificationPreferences {
+  has_email: boolean
+  email: string | null
+  email_verified: boolean
+  notify_news: boolean
+  notify_expiry: boolean
+  notify_support: boolean
+}
+
+export async function getNotifications(): Promise<NotificationPreferences> {
+  if (isDev) {
+    return {
+      has_email: true,
+      email: 'demo@example.com',
+      email_verified: true,
+      notify_news: true,
+      notify_expiry: true,
+      notify_support: true,
+    }
+  }
+  const { data } = await api.get<NotificationPreferences>('/web/me/notifications')
+  return data
+}
+
+export async function updateNotifications(
+  prefs: Partial<Pick<NotificationPreferences, 'notify_news' | 'notify_expiry' | 'notify_support'>>,
+): Promise<void> {
+  if (isDev) return
+  await api.patch('/web/me/notifications', prefs)
+}

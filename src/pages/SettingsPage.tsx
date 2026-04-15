@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar, Mail, Check, LogOut } from 'lucide-react'
+import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar, Mail, Check, LogOut, Bell, Newspaper, MessageCircle } from 'lucide-react'
 import { getMe } from '../api/user'
-import { toggleAutoRenew, togglePro, unbindCard } from '../api/subscription'
+import { toggleAutoRenew, togglePro, unbindCard, getNotifications, updateNotifications } from '../api/subscription'
 import { linkEmail } from '../api/auth'
 import { TARIFF_NAMES, DURATION_LABELS } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
@@ -24,6 +24,16 @@ export default function SettingsPage() {
   const [linkEmailSuccess, setLinkEmailSuccess] = useState(false)
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
+  const { data: notifs } = useQuery({ queryKey: ['notifications'], queryFn: getNotifications })
+
+  const notifMutation = useMutation({
+    mutationFn: (prefs: { notify_news?: boolean; notify_expiry?: boolean; notify_support?: boolean }) =>
+      updateNotifications(prefs),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      haptic?.notificationOccurred('success')
+    },
+  })
 
   const autoRenewMutation = useMutation({
     mutationFn: (val: boolean) => toggleAutoRenew({ auto_renew: val }),
@@ -230,6 +240,64 @@ export default function SettingsPage() {
           </>
         )}
       </div>
+
+      {/* Email notifications */}
+      {notifs?.has_email && notifs?.email_verified && (
+        <div className="glass-card p-4 space-y-3">
+          <div className="flex items-center gap-3 mb-1">
+            <Bell className="w-5 h-5 text-surface-400" />
+            <div>
+              <p className="text-sm font-medium">Email-уведомления</p>
+              <p className="text-xs text-surface-500">{notifs.email}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <div className="flex items-center gap-3">
+              <Newspaper className="w-4 h-4 text-surface-500" />
+              <div>
+                <p className="text-sm">Новости сервиса</p>
+                <p className="text-xs text-surface-500">Посты из Telegram-канала</p>
+              </div>
+            </div>
+            <Toggle
+              enabled={notifs.notify_news}
+              onChange={(val) => notifMutation.mutate({ notify_news: val })}
+              disabled={notifMutation.isPending}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2 border-t border-surface-800/50">
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 text-surface-500" />
+              <div>
+                <p className="text-sm">Окончание подписки</p>
+                <p className="text-xs text-surface-500">За 3 и 1 день до, после окончания</p>
+              </div>
+            </div>
+            <Toggle
+              enabled={notifs.notify_expiry}
+              onChange={(val) => notifMutation.mutate({ notify_expiry: val })}
+              disabled={notifMutation.isPending}
+            />
+          </div>
+
+          <div className="flex items-center justify-between py-2 border-t border-surface-800/50">
+            <div className="flex items-center gap-3">
+              <MessageCircle className="w-4 h-4 text-surface-500" />
+              <div>
+                <p className="text-sm">Ответы поддержки</p>
+                <p className="text-xs text-surface-500">Когда оператор отвечает в чате</p>
+              </div>
+            </div>
+            <Toggle
+              enabled={notifs.notify_support}
+              onChange={(val) => notifMutation.mutate({ notify_support: val })}
+              disabled={notifMutation.isPending}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Logout */}
       <button

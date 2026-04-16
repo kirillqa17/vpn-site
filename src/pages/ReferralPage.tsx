@@ -7,8 +7,8 @@ import { useState } from 'react'
 import { BOT_USERNAME, TARIFF_NAMES } from '../utils/constants'
 
 const MILESTONES = [
-  { count: 5, reward: '365 дней подписки (Семейный)' },
-  { count: 10, reward: 'Безлимитная подписка (Семейный)' },
+  { count: 5, reward: '180 дней подписки (Семейный)' },
+  { count: 10, reward: '365 дней подписки (Семейный)' },
 ]
 
 export default function ReferralPage() {

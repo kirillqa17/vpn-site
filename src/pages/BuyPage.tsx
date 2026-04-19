@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { Check, Tag, CreditCard, Bitcoin, Loader2 } from 'lucide-react'
@@ -28,6 +28,16 @@ export default function BuyPage() {
   const { data: prices } = useQuery({ queryKey: ['prices'], queryFn: getPrices })
   const { data: user } = useQuery({ queryKey: ['me'], queryFn: getMe })
 
+  const bsMonthOnly = prices?.bs_month_only === true
+  const isBsTariff = tariff === 'bsbase' || tariff === 'bsfamily'
+  const availableDurations: readonly string[] = bsMonthOnly && isBsTariff ? ['1m'] : DURATIONS
+
+  useEffect(() => {
+    if (bsMonthOnly && isBsTariff && duration !== '1m') {
+      setDuration('1m')
+    }
+  }, [bsMonthOnly, isBsTariff, duration])
+
   const promoMutation = useMutation({
     mutationFn: () => validatePromo(promo, tariff),
     onSuccess: (data) => setPromoResult(data),
@@ -46,7 +56,7 @@ export default function BuyPage() {
     },
   })
 
-  const price = prices?.[tariff as keyof typeof prices]?.[duration as '1m' | '3m' | '1y'] ?? 0
+  const price = (prices as any)?.[tariff]?.[duration] ?? 0
   const discount = promoResult?.valid ? promoResult.discount_percent : 0
   const finalPrice = Math.round(price * (1 - discount / 100))
 
@@ -151,8 +161,8 @@ export default function BuyPage() {
       <div className="space-y-2">
         <p className="text-sm text-surface-400 font-medium">Период</p>
         <div className="flex gap-2">
-          {DURATIONS.map((d) => {
-            const p = prices?.[tariff as keyof typeof prices]?.[d] ?? 0
+          {availableDurations.map((d) => {
+            const p = (prices as any)?.[tariff]?.[d] ?? 0
             return (
               <button
                 key={d}

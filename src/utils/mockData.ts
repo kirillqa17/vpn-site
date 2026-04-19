@@ -30,9 +30,9 @@ export const MOCK_DEVICES: Device[] = [
 
 export const MOCK_PRICES: TariffPrices = {
   base: { '1m': 150, '3m': 430, '1y': 1500 },
-  family: { '1m': 200, '3m': 570, '1y': 1800 },
-  bsbase: { '1m': 250, '3m': 720, '1y': 2500 },
-  bsfamily: { '1m': 300, '3m': 850, '1y': 2700 },
+  family: { '1m': 250, '3m': 700, '1y': 2200 },
+  bsbase: { '1m': 450, '3m': 1250, '1y': 4500 },
+  bsfamily: { '1m': 750, '3m': 2100, '1y': 7500 },
 }
 
 export const MOCK_REFERRAL: ReferralInfo = {

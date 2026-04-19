@@ -38,6 +38,7 @@ export interface TariffPrices {
   family: { '1m': number; '3m': number; '1y': number }
   bsbase: { '1m': number; '3m': number; '1y': number }
   bsfamily: { '1m': number; '3m': number; '1y': number }
+  bs_month_only?: boolean
 }
 
 export interface PromoValidation {

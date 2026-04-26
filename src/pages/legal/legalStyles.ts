@@ -59,15 +59,16 @@ export function langToggleStyles(selected: boolean): React.CSSProperties {
   }
 }
 
-// Operator placeholders. Replace at render time once the legal entity is set.
-// Until then, we render an obvious placeholder so reviewers can see what's missing.
+// Operator details for the legal documents.
 export const OPERATOR = {
-  name: '[ИП / ООО — наименование оператора]',
-  inn: '[ИНН]',
-  ogrn: '[ОГРН / ОГРНИП]',
-  address: '[Юридический адрес оператора]',
-  bankRequisites: '[Расчётный счёт, БИК, банк]',
+  name: 'Индивидуальный предприниматель Захаров Кирилл Олегович',
+  inn: '165506420095',
+  ogrn: '326169000056900',
+  address: '420111, г. Казань, ул. Япеева, д. 13а, кв. 13',
+  bankRequisites: 'р/с 40802810962710018495 (БИК и наименование банка уточняются)',
   contactEmail: 'support@svoiweb.ru',
-  legalEmail: '[Email для официальной переписки]',
-  rkn: '[Регистрационный номер оператора в реестре Роскомнадзора, при наличии]',
+  legalEmail: 'support@svoiweb.ru',
+  // Не заполнено: уведомление в Роскомнадзор не подано. Будет добавлено
+  // после регистрации в реестре операторов ПДн (https://pd.rkn.gov.ru/).
+  rkn: 'Уведомление в Роскомнадзор подаётся в установленном порядке',
 }

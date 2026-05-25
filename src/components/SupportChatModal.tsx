@@ -119,6 +119,10 @@ export default function SupportChatModal({ onClose }: Props) {
         if (!escalated) {
           // First escalation — notify admin
           try { await escalateSupport() } catch {}
+          // Show push opt-in same as in handleEscalate
+          if (isPushSupported() && getPushPromptStatus() === 'never') {
+            setShowPushPrompt(true)
+          }
         }
         setEscalated(true)
       } else if (result.response) {

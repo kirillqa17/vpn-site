@@ -65,3 +65,24 @@ export async function escalateSupport(): Promise<void> {
     })
   }
 }
+
+// Payload sent to backend for VAPID push subscription
+export interface WebPushSubscribePayload {
+  endpoint: string
+  keys: { p256dh: string; auth: string }
+}
+
+export async function subscribePush(
+  subscription: WebPushSubscribePayload,
+  userAgent?: string,
+): Promise<void> {
+  const body = { subscription, user_agent: userAgent ?? navigator.userAgent }
+  if (isAuthenticated()) {
+    await api.post('/web/support/push/subscribe', body)
+  } else {
+    await axios.post('/api/web/support/public/push/subscribe', {
+      session_id: getSessionId(),
+      ...body,
+    })
+  }
+}

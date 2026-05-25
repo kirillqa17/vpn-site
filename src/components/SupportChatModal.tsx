@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react'
 import { X, Send, AlertTriangle, Bot, User, ShieldCheck } from 'lucide-react'
 import { getSupportHistory, sendSupportMessage, escalateSupport, type SupportMessage } from '../api/support'
 import { useSupportNotificationsCtx } from '../hooks/supportNotificationsContext'
+import PushPermissionPrompt from './PushPermissionPrompt'
+import { isPushSupported, getPushPromptStatus } from '../lib/webPush'
 
 interface Props {
   onClose: () => void
@@ -14,6 +16,7 @@ export default function SupportChatModal({ onClose }: Props) {
   const [loading, setLoading] = useState(true)
   const [escalated, setEscalated] = useState(false)
   const [showConfirm, setShowConfirm] = useState(false)
+  const [showPushPrompt, setShowPushPrompt] = useState(false)
   const [viewportHeight, setViewportHeight] = useState<number | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
@@ -138,6 +141,10 @@ export default function SupportChatModal({ onClose }: Props) {
     try {
       await escalateSupport()
       setEscalated(true)
+      // Show push opt-in if supported and not yet shown
+      if (isPushSupported() && getPushPromptStatus() === 'never') {
+        setShowPushPrompt(true)
+      }
       const sysMsg: SupportMessage = { role: 'ai', content: 'Оператор подключится в ближайшее время. Ожидайте ответа.', created_at: new Date().toISOString() }
       setMessages(prev => [...prev, sysMsg])
     } catch {
@@ -312,6 +319,10 @@ export default function SupportChatModal({ onClose }: Props) {
           </button>
         </div>
       </div>
+
+      {showPushPrompt && (
+        <PushPermissionPrompt onClose={() => setShowPushPrompt(false)} />
+      )}
     </div>
   )
 }

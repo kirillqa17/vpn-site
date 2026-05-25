@@ -27,6 +27,8 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/vpn-web:latest
           context: .
+          build-args: |
+            VITE_VAPID_PUBLIC_KEY=${{ secrets.VITE_VAPID_PUBLIC_KEY }}
 
   deploy:
     needs: build-and-push

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { X, Send, AlertTriangle, Bot, User, ShieldCheck } from 'lucide-react'
 import { getSupportHistory, sendSupportMessage, escalateSupport, type SupportMessage } from '../api/support'
+import { useSupportNotificationsCtx } from '../hooks/supportNotificationsContext'
 
 interface Props {
   onClose: () => void
@@ -18,6 +19,7 @@ export default function SupportChatModal({ onClose }: Props) {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const sendingRef = useRef(false)
+  const { markAllRead } = useSupportNotificationsCtx()
 
   // Track sending state in ref for polling
   useEffect(() => {
@@ -27,6 +29,7 @@ export default function SupportChatModal({ onClose }: Props) {
   // Load history on mount
   useEffect(() => {
     loadHistory()
+    markAllRead()
   }, [])
 
   // Scroll to bottom on new messages
@@ -63,6 +66,8 @@ export default function SupportChatModal({ onClose }: Props) {
         // Only update if server has more messages (avoid overwriting optimistic updates)
         setMessages(prev => {
           if (history.messages.length > prev.length) {
+            // Modal is open — user sees the message right now
+            markAllRead()
             return history.messages
           }
           return prev
@@ -70,7 +75,7 @@ export default function SupportChatModal({ onClose }: Props) {
       } catch {
         // ignore polling errors
       }
-    }, 5000)
+    }, 10000)
 
     return () => {
       if (pollRef.current) clearInterval(pollRef.current)

@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreditCard, Zap, RefreshCw, Trash2, Info, Calendar, Mail, Check, LogOut, Bell, Newspaper, MessageCircle } from 'lucide-react'
 import { getMe } from '../api/user'
 import { toggleAutoRenew, togglePro, unbindCard, getNotifications, updateNotifications } from '../api/subscription'
-import { linkEmail } from '../api/auth'
+import { linkEmail, claimEmail } from '../api/auth'
 import { TARIFF_NAMES, DURATION_LABELS } from '../utils/constants'
 import { useTelegram } from '../hooks/useTelegram'
 import { useAuthStore } from '../stores/authStore'
@@ -22,6 +22,11 @@ export default function SettingsPage() {
   const [linkPasswordValue, setLinkPasswordValue] = useState('')
   const [linkEmailError, setLinkEmailError] = useState('')
   const [linkEmailSuccess, setLinkEmailSuccess] = useState(false)
+  const [showClaim, setShowClaim] = useState(false)
+  const [claimEmailValue, setClaimEmailValue] = useState('')
+  const [claimPasswordValue, setClaimPasswordValue] = useState('')
+  const [claimError, setClaimError] = useState('')
+  const [claimSuccess, setClaimSuccess] = useState(false)
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
   const { data: notifs } = useQuery({ queryKey: ['notifications'], queryFn: getNotifications })
@@ -73,6 +78,22 @@ export default function SettingsPage() {
     onError: (err: any) => {
       const msg = err?.response?.data
       setLinkEmailError(typeof msg === 'string' ? msg : msg?.error || msg?.message || 'Не удалось выполнить')
+    },
+  })
+
+  const claimEmailMutation = useMutation({
+    mutationFn: () => claimEmail(claimEmailValue, claimPasswordValue),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['me'] })
+      haptic?.notificationOccurred('success')
+      setClaimEmailValue('')
+      setClaimPasswordValue('')
+      setClaimError('')
+      setClaimSuccess(true)
+    },
+    onError: (err: any) => {
+      const msg = err?.response?.data
+      setClaimError(typeof msg === 'string' ? msg : msg?.error || msg?.message || 'Не удалось выполнить')
     },
   })
 
@@ -237,6 +258,68 @@ export default function SettingsPage() {
             >
               {linkEmailMutation.isPending ? 'Привязка...' : 'Привязать email'}
             </button>
+
+            {/* Claim: recover the email-only account a user accidentally created
+                via Login → Register before they realised it would be a dup. */}
+            <div className="pt-3 border-t border-surface-800/60">
+              {!showClaim ? (
+                <button
+                  type="button"
+                  onClick={() => setShowClaim(true)}
+                  className="text-xs text-surface-400 hover:text-white transition-colors"
+                >
+                  Уже создавали аккаунт по email раньше? Перенести его сюда →
+                </button>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-xs text-surface-400">
+                    Введите email и пароль от существующего email-аккаунта — мы перенесём подписку
+                    и привяжем email к этому Telegram-аккаунту.
+                  </p>
+                  <input
+                    type="email"
+                    placeholder="Email от старого аккаунта"
+                    value={claimEmailValue}
+                    onChange={(e) => { setClaimEmailValue(e.target.value); setClaimError(''); setClaimSuccess(false) }}
+                    className="input-field text-sm"
+                  />
+                  <input
+                    type="password"
+                    placeholder="Пароль"
+                    value={claimPasswordValue}
+                    onChange={(e) => { setClaimPasswordValue(e.target.value); setClaimError(''); setClaimSuccess(false) }}
+                    className="input-field text-sm"
+                  />
+                  {claimError && <p className="text-red-400 text-xs">{claimError}</p>}
+                  {claimSuccess && (
+                    <p className="text-green-400 text-xs">Готово! Email перенесён, подписка объединена.</p>
+                  )}
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => {
+                        setClaimError('')
+                        if (!claimEmailValue.trim() || !claimPasswordValue.trim()) {
+                          setClaimError('Заполните все поля')
+                          return
+                        }
+                        claimEmailMutation.mutate()
+                      }}
+                      disabled={claimEmailMutation.isPending}
+                      className="btn-primary flex-1 text-sm"
+                    >
+                      {claimEmailMutation.isPending ? 'Перенос...' : 'Перенести аккаунт'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowClaim(false); setClaimError(''); setClaimSuccess(false) }}
+                      className="px-3 text-sm text-surface-400 hover:text-white"
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>

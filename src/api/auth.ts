@@ -52,6 +52,21 @@ export async function linkEmail(email: string, password: string) {
   await api.post('/web/auth/link-email', { email, password })
 }
 
+/**
+ * Claim an existing email-only account and merge it into the current
+ * Telegram-authenticated account. Used by users who accidentally created
+ * a duplicate via the Register screen instead of linking via Settings.
+ *
+ * Returns the merged subscription_end (the later of the two accounts).
+ */
+export async function claimEmail(email: string, password: string): Promise<{ subscription_end: string }> {
+  const { data } = await api.post<{ status: string; merged_subscription: boolean; subscription_end: string }>(
+    '/web/auth/claim-email',
+    { email, password },
+  )
+  return { subscription_end: data.subscription_end }
+}
+
 export async function telegramInit(): Promise<string> {
   const { data } = await api.post<{ code: string }>('/web/auth/telegram-init')
   return data.code

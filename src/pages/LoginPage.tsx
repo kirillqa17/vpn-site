@@ -21,6 +21,7 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [info, setInfo] = useState('')
+  const [confirmNewAccount, setConfirmNewAccount] = useState(false)
   const [resendTimer, setResendTimer] = useState(0)
   const [news, setNews] = useState<NewsPost[]>([])
   const [expandedPost, setExpandedPost] = useState<number | null>(null)
@@ -329,6 +330,17 @@ export default function LoginPage() {
           {/* Register form */}
           {screen === 'register' && (
             <form onSubmit={handleRegister} className="space-y-3">
+              {/* WARNING: 88% of registrations were accidentally creating duplicate
+                  accounts when the user already had a Telegram-bound SvoiVPN account.
+                  Force them to acknowledge they're a NEW user. */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3 space-y-2">
+                <p className="text-yellow-400 text-xs font-medium">
+                  ⚠️ Уже пользуетесь SvoiVPN через Telegram?
+                </p>
+                <p className="text-surface-300 text-xs leading-relaxed">
+                  Не создавайте новый аккаунт по email — потеряете подписку. Войдите через Telegram (кнопка ниже), затем привяжите email в Настройках.
+                </p>
+              </div>
               <input type="email" placeholder="Email" value={email}
                 onChange={(e) => setEmail(e.target.value)} className="input-field" autoComplete="email" />
               <div className="relative">
@@ -341,8 +353,17 @@ export default function LoginPage() {
               </div>
               <input type={showPassword ? 'text' : 'password'} placeholder="Подтвердите пароль" value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)} className="input-field" autoComplete="new-password" />
+              <label className="flex items-start gap-2 text-xs text-surface-400 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={confirmNewAccount}
+                  onChange={(e) => setConfirmNewAccount(e.target.checked)}
+                  className="mt-0.5 accent-blue-500"
+                />
+                <span>Подтверждаю: у меня <b>нет</b> аккаунта SvoiVPN через Telegram, я создаю новый</span>
+              </label>
               {error && <p className="text-red-400 text-xs">{error}</p>}
-              <button type="submit" disabled={isSubmitting} className="btn-primary w-full">
+              <button type="submit" disabled={isSubmitting || !confirmNewAccount} className="btn-primary w-full disabled:opacity-50">
                 {isSubmitting ? 'Создание...' : 'Создать аккаунт'}
               </button>
             </form>

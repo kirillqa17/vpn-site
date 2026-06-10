@@ -44,6 +44,16 @@ export default function SetupPage() {
 
   const subLink = user?.sub_link ?? ''
 
+  function addProxy(tmeLink: string) {
+    // Direct deep-link: t.me web page won't load for RU users without VPN, so jump
+    // straight into the Telegram app (browser → tg://, mini-app → internal openTelegramLink).
+    if (isMiniApp && tg) {
+      tg.openTelegramLink(tmeLink)
+    } else {
+      window.location.href = tmeLink.replace('https://t.me/proxy?', 'tg://proxy?')
+    }
+  }
+
   function openLink(url: string) {
     if (isMiniApp && tg) {
       tg.openLink(url)
@@ -112,7 +122,7 @@ export default function SetupPage() {
               Активен до {proxy.expires ? new Date(proxy.expires).toLocaleDateString('ru-RU') : '—'}. Открывает Telegram даже без VPN.
             </p>
             <button
-              onClick={() => openLink(proxy.link!)}
+              onClick={() => addProxy(proxy.link!)}
               className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
             >
               <Send className="w-4 h-4" /> Добавить в Telegram

@@ -52,6 +52,7 @@ declare global {
           selectionChanged: () => void
         }
         openLink: (url: string) => void
+        openTelegramLink: (url: string) => void
         showConfirm: (message: string, cb: (ok: boolean) => void) => void
         showAlert: (message: string, cb?: () => void) => void
       }

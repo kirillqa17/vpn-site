@@ -3,6 +3,7 @@ import { useQuery, useMutation } from '@tanstack/react-query'
 import { useSearchParams } from 'react-router-dom'
 import { Apple, Smartphone, Monitor, ExternalLink, Copy, Check, HelpCircle, Clock, Send } from 'lucide-react'
 import { getMe } from '../api/user'
+import { getProxy } from '../api/proxy'
 // generateLinkCode removed
 import { useTelegram } from '../hooks/useTelegram'
 import Spinner from '../components/ui/Spinner'
@@ -28,6 +29,7 @@ export default function SetupPage() {
   const isTrialRedirect = searchParams.get('trial') === '1'
 
   const { data: user, isLoading } = useQuery({ queryKey: ['me'], queryFn: getMe })
+  const { data: proxy } = useQuery({ queryKey: ['proxy'], queryFn: getProxy })
   const isEmailUser = user && user.telegram_id < 0
 
   // linkMutation removed (generateLinkCode no longer available)
@@ -97,6 +99,34 @@ export default function SetupPage() {
           </div>
         </div>
       )}
+
+      {/* Telegram proxy */}
+      <div className="glass-card p-4 space-y-3">
+        <div className="flex items-center gap-2">
+          <Send className="w-4 h-4 text-sky-400" />
+          <p className="font-medium">Прокси для Telegram</p>
+        </div>
+        {proxy?.active && proxy.link ? (
+          <>
+            <p className="text-xs text-surface-400">
+              Активен до {proxy.expires ? new Date(proxy.expires).toLocaleDateString('ru-RU') : '—'}. Открывает Telegram даже без VPN.
+            </p>
+            <button
+              onClick={() => openLink(proxy.link!)}
+              className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
+            >
+              <Send className="w-4 h-4" /> Добавить в Telegram
+            </button>
+          </>
+        ) : (
+          <>
+            <p className="text-xs text-surface-400">Доступен по активной подписке.</p>
+            <a href="/buy" className="btn-secondary w-full flex items-center justify-center gap-2 text-sm">
+              Оформить подписку
+            </a>
+          </>
+        )}
+      </div>
 
       {/* Trial instructions banner */}
       {isTrialRedirect && (

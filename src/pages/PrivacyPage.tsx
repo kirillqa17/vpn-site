@@ -36,7 +36,9 @@ export default function PrivacyPage() {
   )
 }
 
-function RuPrivacy() {
+// Exported so scripts/prerender-legal.mjs can render each language to static
+// HTML at build time (single source of truth for /privacy — see nginx.conf).
+export function RuPrivacy() {
   return (
     <section>
       <h1 style={h1}>Политика обработки персональных данных</h1>
@@ -281,7 +283,7 @@ function RuPrivacy() {
   )
 }
 
-function EnPrivacy() {
+export function EnPrivacy() {
   return (
     <section>
       <h1 style={h1}>Privacy Policy</h1>

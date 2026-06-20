@@ -13,6 +13,7 @@ import SettingsPage from './pages/SettingsPage'
 import NewsPage from './pages/NewsPage'
 import LoginPage from './pages/LoginPage'
 import PrivacyPage from './pages/PrivacyPage'
+import SupportPage from './pages/SupportPage'
 import TermsPage from './pages/TermsPage'
 import Spinner from './components/ui/Spinner'
 
@@ -63,6 +64,7 @@ export default function App() {
       <Routes>
         <Route path="/news" element={<NewsPage />} />
         <Route path="/privacy" element={<PrivacyPage />} />
+        <Route path="/support" element={<SupportPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="*" element={<LoginPage />} />
       </Routes>
@@ -81,6 +83,7 @@ export default function App() {
         <Route path="/settings" element={<SettingsPage />} />
       </Route>
       <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/support" element={<SupportPage />} />
       <Route path="/terms" element={<TermsPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

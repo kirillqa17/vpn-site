@@ -32,28 +32,50 @@ const vite = await createServer({
   appType: 'custom',
 })
 
-try {
-  const mod = await vite.ssrLoadModule('/src/pages/PrivacyPage.tsx')
-  if (!mod.RuPrivacy || !mod.EnPrivacy) {
-    throw new Error('PrivacyPage.tsx must export RuPrivacy and EnPrivacy')
-  }
-
-  const ru = renderToStaticMarkup(React.createElement(mod.RuPrivacy))
-  const en = renderToStaticMarkup(React.createElement(mod.EnPrivacy))
-
-  // Fail the build rather than silently shipping an empty/broken policy.
-  if (!ru.includes('Политика') || ru.length < 3000) {
-    throw new Error(`Prerendered RU privacy looks wrong (length=${ru.length})`)
-  }
-
-  const html = renderPage({
+// Each page is a React module exporting Ru* / En* components. The Support page
+// (/support) is the App Store / Google Play "Support URL": a real web page with
+// contact info and FAQ, not a chat deep-link (Apple rejects t.me/... links).
+const PAGES = [
+  {
+    module: '/src/pages/PrivacyPage.tsx',
+    ruExport: 'RuPrivacy',
+    enExport: 'EnPrivacy',
+    out: 'privacy.html',
     title: 'Политика обработки персональных данных — SvoiVPN',
-    ru,
-    en,
-  })
-  const out = resolve(distDir, 'privacy.html')
-  writeFileSync(out, html, 'utf8')
-  console.log(`[prerender] wrote ${out} (${html.length} bytes)`)
+    mustInclude: 'Политика',
+    minLen: 3000,
+  },
+  {
+    module: '/src/pages/SupportPage.tsx',
+    ruExport: 'RuSupport',
+    enExport: 'EnSupport',
+    out: 'support.html',
+    title: 'Поддержка — SvoiVPN',
+    mustInclude: 'support@svoiweb.ru',
+    minLen: 800,
+  },
+]
+
+try {
+  for (const page of PAGES) {
+    const mod = await vite.ssrLoadModule(page.module)
+    if (!mod[page.ruExport] || !mod[page.enExport]) {
+      throw new Error(`${page.module} must export ${page.ruExport} and ${page.enExport}`)
+    }
+
+    const ru = renderToStaticMarkup(React.createElement(mod[page.ruExport]))
+    const en = renderToStaticMarkup(React.createElement(mod[page.enExport]))
+
+    // Fail the build rather than silently shipping an empty/broken page.
+    if (!ru.includes(page.mustInclude) || ru.length < page.minLen) {
+      throw new Error(`Prerendered RU ${page.out} looks wrong (length=${ru.length})`)
+    }
+
+    const html = renderPage({ title: page.title, ru, en })
+    const out = resolve(distDir, page.out)
+    writeFileSync(out, html, 'utf8')
+    console.log(`[prerender] wrote ${out} (${html.length} bytes)`)
+  }
 } finally {
   await vite.close()
 }

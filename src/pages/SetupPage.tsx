@@ -17,7 +17,7 @@ const PLATFORMS = [
 ]
 
 const APP_LINKS = {
-  ios: 'https://apps.apple.com/ru/app/happ-proxy-utility-plus/id6746188973',
+  ios: 'https://apps.apple.com/ru/app/happ-proxy-utility/id6783623643',
   android: 'https://play.google.com/store/apps/details?id=com.happproxy&pli=1',
 }
 
@@ -208,9 +208,38 @@ export default function SetupPage() {
       {platform === 'pc' && (
         <div className="space-y-3 animate-fade-in">
           <div className="glass-card p-4">
-            <p className="font-medium mb-2">Ссылка на конфигурацию</p>
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">1</div>
+              <p className="font-medium">Установите приложение</p>
+            </div>
             <p className="text-sm text-surface-400 mb-3">
-              Скопируйте и вставьте в VPN-клиент (Hiddify, v2rayN, Nekoray и др.)
+              Рекомендуем клиент SvoiVPN для Windows. Также подойдёт Happ.
+            </p>
+            <div className="space-y-2">
+              <button
+                onClick={() => openLink('https://github.com/alexander174116/SvoiVPN-releases/releases/latest/download/SvoiVPN-Setup.exe')}
+                className="btn-primary w-full flex items-center justify-center gap-2 text-sm"
+              >
+                <Monitor className="w-4 h-4" />
+                Скачать SvoiVPN для ПК
+              </button>
+              <button
+                onClick={() => openLink('https://github.com/Happ-proxy/happ-desktop/releases/latest/download/setup-Happ.x64.exe')}
+                className="btn-secondary w-full flex items-center justify-center gap-2 text-sm"
+              >
+                <ExternalLink className="w-4 h-4" />
+                Скачать Happ для ПК
+              </button>
+            </div>
+          </div>
+
+          <div className="glass-card p-4">
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-7 h-7 rounded-full bg-white text-black flex items-center justify-center text-sm font-bold">2</div>
+              <p className="font-medium">Добавьте подписку</p>
+            </div>
+            <p className="text-sm text-surface-400 mb-3">
+              Скопируйте ссылку и вставьте её в приложение (кнопка «+»)
             </p>
             <div className="flex gap-2">
               <code className="flex-1 bg-surface-800 rounded-lg px-3 py-2 text-xs text-surface-300 overflow-hidden text-ellipsis whitespace-nowrap">
@@ -223,20 +252,6 @@ export default function SetupPage() {
                 {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
-          </div>
-
-          <div className="glass-card p-4">
-            <p className="font-medium mb-2">Подробная инструкция</p>
-            <p className="text-sm text-surface-400 mb-3">
-              Инструкция по установке и проксированию трафика на ПК
-            </p>
-            <button
-              onClick={() => openLink('https://telegra.ph/Instrukciya-ustanovki-i-primeneniya-konfiga-SvoiVPN-dlya-PK-04-09')}
-              className="btn-secondary w-full flex items-center justify-center gap-2 text-sm"
-            >
-              <ExternalLink className="w-4 h-4" />
-              Открыть инструкцию
-            </button>
           </div>
         </div>
       )}

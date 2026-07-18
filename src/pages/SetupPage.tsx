@@ -17,7 +17,8 @@ const PLATFORMS = [
 ]
 
 const APP_LINKS = {
-  ios: 'https://apps.apple.com/ru/app/happ-proxy-utility/id6783623643',
+  // RU App Store зачищен от VPN-клиентов (июль 2026) — жива только US-версия Happ
+  ios: 'https://apps.apple.com/us/app/happ-proxy-utility/id6504287215',
   android: 'https://play.google.com/store/apps/details?id=com.happproxy&pli=1',
 }
 
